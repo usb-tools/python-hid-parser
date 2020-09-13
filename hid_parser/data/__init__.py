@@ -204,7 +204,7 @@ class GenericDesktopControls(_Data):
     SYSTEM_DISPLAY_DUAL = 0xB4, 'System Display Dual'
     SYSTEM_DISPLAY_TOGGLE = 0xB5, 'System Display Toggle Int/Ext'
     SYSTEM_DISPLAY_SWAP = 0xB6, 'System Display Swap Primary/Secondary'
-    SYSTEM_DISPLAY_ = 0xB7, 'System Display LCD Autoscale'
+    SYSTEM_DISPLAY_LCD_AUTOSCALE = 0xB7, 'System Display LCD Autoscale'
 
 
 class Button(_Data):
