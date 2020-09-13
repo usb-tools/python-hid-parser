@@ -14,7 +14,7 @@ else:
 import hid_parser.data
 
 
-version = '0.0.0'
+__version__ = '0.0.1'
 
 
 class Type():
