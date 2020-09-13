@@ -153,6 +153,19 @@ class ReportDescriptor():
 
             i += size + 1
 
+    @staticmethod
+    def _get_main_item_desc(value: int) -> str:
+        return ', '.join([
+            'Constant' if value & (0 << 0) else 'Data',
+            'Variable' if value & (0 << 1) else 'Array',
+            'Relative' if value & (0 << 2) else 'Absolute',
+            'Wrap' if value & (0 << 3) else 'No Wrap',
+            'Non Linear' if value & (0 << 4) else 'Linear',
+            'No Preferred State' if value & (0 << 5) else 'Preferred State',
+            'Null State' if value & (0 << 6) else 'No Null position',
+            'Buffered Bytes' if value & (0 << 8) else 'Bit Field',
+        ])
+
     def print(self, level: int = 0, file: TextIO = sys.stdout) -> None:  # noqa: C901
         def printl(string: str) -> None:
             print(' ' * level + string, file=file)
@@ -163,13 +176,19 @@ class ReportDescriptor():
             if typ == Type.MAIN:
 
                 if tag == TagMain.INPUT:
-                    printl(f'Input ({data})')
+                    if data is None:
+                        raise InvalidReportDescriptor('Invalid input item')
+                    printl(f'Input ({self._get_main_item_desc(data)})')
 
                 elif tag == TagMain.OUTPUT:
-                    printl(f'Output ({data})')
+                    if data is None:
+                        raise InvalidReportDescriptor('Invalid output item')
+                    printl(f'Output ({self._get_main_item_desc(data)})')
 
                 elif tag == TagMain.FEATURE:
-                    printl(f'Feature ({data})')
+                    if data is None:
+                        raise InvalidReportDescriptor('Invalid feature item')
+                    printl(f'Feature ({self._get_main_item_desc(data)})')
 
                 elif tag == TagMain.COLLECTION:
                     printl(f'Collection ({hid_parser.data.Collections.get_description(data)})')
