@@ -85,6 +85,17 @@ class _Data(metaclass=_DataMeta):
         raise KeyError('Value not found')
 
 
+class Collections(_Data):
+    PHYSICAL = 0x00, 'Physical'
+    APPLICATION = 0x01, 'Application'
+    LOGICAL = 0x02, 'Logical'
+    REPORT = 0x03, 'Report'
+    NAMED_ARRAY = 0x04, 'Named Array'
+    USAGE_SWITCH = 0x05, 'Usage Switch'
+    USAGE_MODIFIER = 0x06, 'Usage Modifier'
+    VENDOR = 0x80, ..., 0xff, 'Vendor'
+
+
 class UsagePages(_Data):
     GENERIC_DESKTOP_CONTROLS_PAGE = 0x01, 'Generic Desktop Controls'
     SIMULATION_CONTROLS_PAGE = 0x02, 'Simulation Controls'

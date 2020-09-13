@@ -156,7 +156,7 @@ class ReportDescriptor():
                 elif tag == TagMain.FEATURE:
                     printl(f'Feature ({data})')
                 elif tag == TagMain.COLLECTION:
-                    printl(f'Collection ({data})')
+                    printl(f'Collection ({hid_parser.data.Collections.get_description(data)})')
                     level += 1
                 elif tag == TagMain.END_COLLECTION:
                     level -= 1
