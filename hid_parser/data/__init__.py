@@ -17,10 +17,26 @@ class _DataMeta(type):
 
     _single and _range will then be populated with
 
-        _single[0x01] = 'Data description'
-        _range.append(tuple(0x02, 0x06, 'Data range description'))
+        MY_DATA_VALUE = 0x01
+        _single[0x01] = ('Data description', None)
+        _range.append(tuple(0x02, 0x06, ('Data range description', None)))
 
-    It also does some verification to prevent duplicated data
+    As you can see, for single data insertions, the variable will be kept with
+    the first value of the tuple. Both single and range data insertions will
+    register the data into the correspondent data holders.
+
+    You can also define subdata,
+
+        MY_DATA_VALUE = 0x01, 'Data description', OTHER_DATA_TYPE
+        MY_DATA_RANGE = 0x02, ..., 0x06, 'Data range description', YET_OTHER_DATA_TYPE
+
+    Which will result in
+
+        MY_DATA_VALUE = 0x01
+        _single[0x01] = ('Data description', OTHER_DATA_TYPE)
+        _range.append(tuple(0x02, 0x06, ('Data range description', YET_OTHER_DATA_TYPE)))
+
+    This metaclass also does some verification to prevent duplicated data.
     '''
     def __new__(mcs, name: str, bases: Tuple[Any], dic: Dict[str, Any]):  # type: ignore  # noqa: C901
         dic['_single'] = {}
