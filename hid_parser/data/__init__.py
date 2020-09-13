@@ -207,6 +207,18 @@ class GenericDesktopControls(_Data):
     SYSTEM_DISPLAY_ = 0xB7, 'System Display LCD Autoscale'
 
 
+class Button(_Data):
+    data = {
+        'NO_BUTTON': (0x0000, 'Button 1 (primary/trigger)'),
+        'BUTTON_1': (0x0001, 'Button 1 (primary/trigger)'),
+        'BUTTON_2': (0x0002, 'Button 2 (secondary)'),
+        'BUTTON_3': (0x0003, 'Button 3 (tertiary)'),
+    }
+
+    for _i in range(0x0004, 0xffff):
+        data[f'BUTTON_{_i}'] = _i, f'Button {_i}'
+
+
 class UsagePages(_Data):
     GENERIC_DESKTOP_CONTROLS_PAGE = 0x01, 'Generic Desktop Controls', GenericDesktopControls
     SIMULATION_CONTROLS_PAGE = 0x02, 'Simulation Controls'
@@ -216,7 +228,7 @@ class UsagePages(_Data):
     GENERIC_DEVICE_CONTROLS_PAGE = 0x06, 'Generic Device Controls'
     KEYBOARD_KEYPAD_PAGE = 0x07, 'Keyboard/Keypad'
     LED_PAGE = 0x08, 'LED'
-    BUTTON_PAGE = 0x09, 'Button'
+    BUTTON_PAGE = 0x09, 'Button', Button
     ORDINAL_PAGE = 0x0A, 'Ordinal'
     TELEPHONY_PAGE = 0x0B, 'Telephony'
     CONSUMER_PAGE = 0x0C, 'Consumer'

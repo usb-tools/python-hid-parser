@@ -5,6 +5,12 @@ import sys
 
 from typing import Iterable, Optional, Sequence, TextIO, Tuple, Union
 
+
+if sys.version_info >= (3, 8):
+    from typing import Literal
+else:
+    from typing_extensions import Literal
+
 import hid_parser.data
 
 
@@ -151,7 +157,7 @@ class ReportDescriptor():
         def printl(string: str) -> None:
             print(' ' * level + string, file=file)
 
-        usage_data = None
+        usage_data: Union[Literal[False], Optional[hid_parser.data._Data]] = False
 
         for typ, tag, data in self._iterate_raw():
             if typ == Type.MAIN:
@@ -221,13 +227,16 @@ class ReportDescriptor():
             elif typ == Type.LOCAL:
 
                 if tag == TagLocal.USAGE:
-                    if not usage_data:
+                    if usage_data is False:
                         raise InvalidReportDescriptor('Usage field found but no usage page')
 
-                    try:
-                        printl(f'Usage ({usage_data.get_description(data)})')
-                    except KeyError:
-                        printl(f'Usage (Unknown 0x{data:04x})')
+                    if usage_data:
+                        try:
+                            printl(f'Usage ({usage_data.get_description(data)})')
+                        except KeyError:
+                            printl(f'Usage (Unknown, 0x{data:04x})')
+                    else:
+                        printl(f'Usage (0x{data:04x})')
 
                 elif tag == TagLocal.USAGE_MINIMUM:
                     printl(f'Usage Minimum ({data})')
