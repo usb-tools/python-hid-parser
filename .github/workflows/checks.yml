@@ -28,6 +28,9 @@ jobs:
         pip install mypy
         mypy --version
 
+    - name: Install dependencies
+      run: pip install typing-extensions
+
     - name: Run mypy
       run: mypy --python-version ${{ matrix.python }} -p hid_parser
 
