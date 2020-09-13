@@ -42,13 +42,19 @@ class _DataMeta(type):
         dic['_single'] = {}
         dic['_range'] = []
 
-        for attr in dic:
-            if not attr.startswith('_') and isinstance(dic[attr], tuple):
-                if len(dic[attr]) == 2 or len(dic[attr]) == 4:  # missing sub data
-                    dic[attr] = dic[attr] + (None,)
+        # allow constructing data via a data dictionary as opposed to directly in the object body
+        if 'data' in dic:
+            data = dic.pop('data')
+        else:
+            data = dic
 
-                if len(dic[attr]) == 3:  # single
-                    num, desc, sub = dic[attr]
+        for attr in data:
+            if not attr.startswith('_') and isinstance(data[attr], tuple):
+                if len(data[attr]) == 2 or len(data[attr]) == 4:  # missing sub data
+                    data[attr] = data[attr] + (None,)
+
+                if len(data[attr]) == 3:  # single
+                    num, desc, sub = data[attr]
 
                     if not isinstance(num, int):
                         raise TypeError(f"First element of '{attr}' should be an int")
@@ -60,8 +66,8 @@ class _DataMeta(type):
 
                     dic[attr] = num
                     dic['_single'][num] = desc, sub
-                elif len(dic[attr]) == 5:  # range
-                    nmin, el, nmax, desc, sub = dic[attr]
+                elif len(data[attr]) == 5:  # range
+                    nmin, el, nmax, desc, sub = data[attr]
 
                     if not el == Ellipsis:
                         raise TypeError(f"Second element of '{attr}' should be an ellipsis (...)")
