@@ -223,10 +223,10 @@ class ReportDescriptor():
                     printl(f'Physical Maximum ({data})')
 
                 elif tag == TagGlobal.UNIT_EXPONENT:
-                    printl(f'Unit Exponent ({data})')
+                    printl(f'Unit Exponent (0x{data:04x})')
 
                 elif tag == TagGlobal.UNIT:
-                    printl(f'Unit ({data})')
+                    printl(f'Unit (0x{data:04x})')
 
                 elif tag == TagGlobal.REPORT_SIZE:
                     printl(f'Report Size ({data})')
