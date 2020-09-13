@@ -586,6 +586,12 @@ class Consumer(_Data):
     AC_DISTRIBUTE_VERTICALLY = 0x029C, 'AC Distribute Vertically'
 
 
+class FIDO(_Data):
+    U2F_AUTHENTICATOR_DEVICEM = 0x01, 'U2F Authenticator Device'
+    INPUT_REPORT_DATA = 0x20, 'Input Report Data'
+    OUTPUT_REPORT_DATA = 0x21, 'Output Report Data'
+
+
 class UsagePages(_Data):
     GENERIC_DESKTOP_CONTROLS_PAGE = 0x01, 'Generic Desktop Controls', GenericDesktopControls
     SIMULATION_CONTROLS_PAGE = 0x02, 'Simulation Controls'
@@ -621,5 +627,5 @@ class UsagePages(_Data):
     CAMERA_CONTROL_PAGE = 0x90, 'Camera Control'
     ARCADE_PAGE = 0x91, 'Arcade'
     GAMING_DEVICE_PAGE = 0x92, 'Gaming Device'
-    FIDO_ALLIANCE_PAGE = 0xF1D0, 'FIDO Alliance'
+    FIDO_ALLIANCE_PAGE = 0xF1D0, 'FIDO Alliance', FIDO
     VENDOR_PAGE = 0xFF00, ..., 0xFFFF, 'Vendor Page'
