@@ -5,7 +5,7 @@ from typing import Any, Dict, List, Optional, Tuple
 
 class _DataMeta(type):
     '''
-    This metaclass populates _desc and _ranges, following the structure described bellow
+    This metaclass populates _single and _range, following the structure described bellow
 
     The class should declare data as follows
 
@@ -15,34 +15,37 @@ class _DataMeta(type):
 
         MY_DATA_RANGE = 0x02, ..., 0x06, 'Data range description'
 
-    _desc and _ranges will then be populated with
+    _single and _range will then be populated with
 
-        _desc[0x01] = 'Data description'
-        _ranges.append(tuple(0x02, 0x06, 'Data range description'))
+        _single[0x01] = 'Data description'
+        _range.append(tuple(0x02, 0x06, 'Data range description'))
 
     It also does some verification to prevent duplicated data
     '''
     def __new__(mcs, name: str, bases: Tuple[Any], dic: Dict[str, Any]):  # type: ignore  # noqa: C901
-        dic['_desc'] = {}
-        dic['_ranges'] = []
+        dic['_single'] = {}
+        dic['_range'] = []
 
         for attr in dic:
             if not attr.startswith('_') and isinstance(dic[attr], tuple):
-                if len(dic[attr]) == 2:
-                    num, desc = dic[attr]
+                if len(dic[attr]) == 2 or len(dic[attr]) == 4:  # missing sub data
+                    dic[attr] = dic[attr] + (None,)
+
+                if len(dic[attr]) == 3:  # single
+                    num, desc, sub = dic[attr]
 
                     if not isinstance(num, int):
                         raise TypeError(f"First element of '{attr}' should be an int")
                     if not isinstance(desc, str):
                         raise TypeError(f"Second element of '{attr}' should be an int")
 
-                    if num in dic['_desc']:
+                    if num in dic['_single']:
                         raise ValueError(f"Duplicated value in '{attr}' ({num})")
 
                     dic[attr] = num
-                    dic['_desc'][num] = desc
-                elif len(dic[attr]) == 4:
-                    nmin, el, nmax, desc = dic[attr]
+                    dic['_single'][num] = desc, sub
+                elif len(dic[attr]) == 5:  # range
+                    nmin, el, nmax, desc, sub = dic[attr]
 
                     if not el == Ellipsis:
                         raise TypeError(f"Second element of '{attr}' should be an ellipsis (...)")
@@ -53,36 +56,50 @@ class _DataMeta(type):
                     if not isinstance(desc, str):
                         raise TypeError(f"Fourth element of '{attr}' should be an int")
 
-                    for num in dic['_desc']:
+                    for num in dic['_single']:
                         if nmin <= num <= nmax:
                             raise ValueError(f"Duplicated value in '{attr}' ({num})")
 
-                    dic['_ranges'].append((nmin, nmax, desc))
+                    dic['_range'].append((nmin, nmax, (desc, sub)))
 
         return super().__new__(mcs, name, bases, dic)
 
 
 class _Data(metaclass=_DataMeta):
     '''
-    This class provides a get_description method to get data out of _desc and _ranges.
+    This class provides a get_description method to get data out of _single and _range.
     See the _DataMeta documentation for more information.
     '''
-    _desc: Dict[int, str]
-    _ranges: List[Tuple[int, int, str]]
+    _DATA = Tuple[str, Optional['_Data']]
+    _single: Dict[int, _DATA]
+    _range: List[Tuple[int, int, _DATA]]
 
     @classmethod
-    def get_description(cls, num: Optional[int]) -> str:
+    def _get_data(cls, num: Optional[int]) -> _DATA:
         if num is None:
             raise KeyError('Value is not an int')
 
-        if num in cls._desc:
-            return cls._desc[num]
+        if num in cls._single:
+            return cls._single[num]
 
-        for nmin, nmax, desc in cls._ranges:
+        for nmin, nmax, data in cls._range:
             if nmin <= num <= nmax:
-                return desc
+                return data
 
         raise KeyError('Value not found')
+
+    @classmethod
+    def get_description(cls, num: Optional[int]) -> str:
+        return cls._get_data(num)[0]
+
+    @classmethod
+    def get_subdata(cls, num: Optional[int]) -> '_Data':
+        subdata = cls._get_data(num)[1]
+
+        if not subdata:
+            raise ValueError('Sub-data not available')
+
+        return subdata
 
 
 class Collections(_Data):
