@@ -182,7 +182,7 @@ class ReportDescriptor():
                 elif tag == TagGlobal.REPORT_SIZE:
                     printl(f'Report Size ({data})')
                 elif tag == TagGlobal.REPORT_ID:
-                    printl(f'Report ID ({data})')
+                    printl(f'Report ID (0x{data:02x})')
                 elif tag == TagGlobal.REPORT_COUNT:
                     printl(f'Report Count ({data})')
                 elif tag == TagGlobal.PUSH:
