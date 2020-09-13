@@ -113,6 +113,10 @@ class Item():
         return self._usage
 
 
+class InvalidReportDescriptor(Exception):
+    pass
+
+
 class ReportDescriptor():
     def __init__(self, data: Sequence[int]) -> None:
         self._data = data
@@ -147,6 +151,8 @@ class ReportDescriptor():
         def printl(string: str) -> None:
             print(' ' * level + string, file=file)
 
+        usage_data = None
+
         for typ, tag, data in self._iterate_raw():
             if typ == Type.MAIN:
                 if tag == TagMain.INPUT:
@@ -165,8 +171,12 @@ class ReportDescriptor():
                 if tag == TagGlobal.USAGE_PAGE:
                     try:
                         printl(f'Usage Page ({hid_parser.data.UsagePages.get_description(data)})')
+                        try:
+                            usage_data = hid_parser.data.UsagePages.get_subdata(data)
+                        except ValueError:
+                            usage_data = None
                     except KeyError:
-                        printl(f'Unknown {data:04x}')
+                        printl(f'Usage Page (Unknown 0x{data:04x})')
                 elif tag == TagGlobal.LOGICAL_MINIMUM:
                     printl(f'Logical Minimum ({data})')
                 elif tag == TagGlobal.LOGICAL_MAXIMUM:
@@ -191,7 +201,13 @@ class ReportDescriptor():
                     printl(f'Pop ({data})')
             elif typ == Type.LOCAL:
                 if tag == TagLocal.USAGE:
-                    printl(f'Usage ({data})')
+                    if not usage_data:
+                        raise InvalidReportDescriptor('Usage field found but no usage page')
+
+                    try:
+                        printl(f'Usage ({usage_data.get_description(data)})')
+                    except KeyError:
+                        printl(f'Usage (Unknown 0x{data:04x})')
                 elif tag == TagLocal.USAGE_MINIMUM:
                     printl(f'Usage Minimum ({data})')
                 elif tag == TagLocal.USAGE_MAXIMUM:
