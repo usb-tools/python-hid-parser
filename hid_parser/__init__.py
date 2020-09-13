@@ -155,19 +155,26 @@ class ReportDescriptor():
 
         for typ, tag, data in self._iterate_raw():
             if typ == Type.MAIN:
+
                 if tag == TagMain.INPUT:
                     printl(f'Input ({data})')
+
                 elif tag == TagMain.OUTPUT:
                     printl(f'Output ({data})')
+
                 elif tag == TagMain.FEATURE:
                     printl(f'Feature ({data})')
+
                 elif tag == TagMain.COLLECTION:
                     printl(f'Collection ({hid_parser.data.Collections.get_description(data)})')
                     level += 1
+
                 elif tag == TagMain.END_COLLECTION:
                     level -= 1
                     printl('End Collection')
+
             elif typ == Type.GLOBAL:
+
                 if tag == TagGlobal.USAGE_PAGE:
                     try:
                         printl(f'Usage Page ({hid_parser.data.UsagePages.get_description(data)})')
@@ -177,29 +184,42 @@ class ReportDescriptor():
                             usage_data = None
                     except KeyError:
                         printl(f'Usage Page (Unknown 0x{data:04x})')
+
                 elif tag == TagGlobal.LOGICAL_MINIMUM:
                     printl(f'Logical Minimum ({data})')
+
                 elif tag == TagGlobal.LOGICAL_MAXIMUM:
                     printl(f'Logical Maximum ({data})')
+
                 elif tag == TagGlobal.PHYSICAL_MINIMUM:
                     printl(f'Physical Minimum ({data})')
+
                 elif tag == TagGlobal.PHYSICAL_MAXIMUM:
                     printl(f'Physical Maximum ({data})')
+
                 elif tag == TagGlobal.UNIT_EXPONENT:
                     printl(f'Unit Exponent ({data})')
+
                 elif tag == TagGlobal.UNIT:
                     printl(f'Unit ({data})')
+
                 elif tag == TagGlobal.REPORT_SIZE:
                     printl(f'Report Size ({data})')
+
                 elif tag == TagGlobal.REPORT_ID:
                     printl(f'Report ID (0x{data:02x})')
+
                 elif tag == TagGlobal.REPORT_COUNT:
                     printl(f'Report Count ({data})')
+
                 elif tag == TagGlobal.PUSH:
                     printl(f'Push ({data})')
+
                 elif tag == TagGlobal.POP:
                     printl(f'Pop ({data})')
+
             elif typ == Type.LOCAL:
+
                 if tag == TagLocal.USAGE:
                     if not usage_data:
                         raise InvalidReportDescriptor('Usage field found but no usage page')
@@ -208,21 +228,30 @@ class ReportDescriptor():
                         printl(f'Usage ({usage_data.get_description(data)})')
                     except KeyError:
                         printl(f'Usage (Unknown 0x{data:04x})')
+
                 elif tag == TagLocal.USAGE_MINIMUM:
                     printl(f'Usage Minimum ({data})')
+
                 elif tag == TagLocal.USAGE_MAXIMUM:
                     printl(f'Usage Maximum ({data})')
+
                 elif tag == TagLocal.DESIGNATOR_INDEX:
                     printl(f'Designator Index ({data})')
+
                 elif tag == TagLocal.DESIGNATOR_MINIMUM:
                     printl(f'Designator Minimum ({data})')
+
                 elif tag == TagLocal.DESIGNATOR_MAXIMUM:
                     printl(f'Designator Maximum ({data})')
+
                 elif tag == TagLocal.STRING_INDEX:
                     printl(f'String Index ({data})')
+
                 elif tag == TagLocal.STRING_MINIMUM:
                     printl(f'String Minimum ({data})')
+
                 elif tag == TagLocal.STRING_MAXIMUM:
                     printl(f'String Maximum ({data})')
+
                 elif tag == TagLocal.DELIMITER:
                     printl(f'Delemiter ({data})')
