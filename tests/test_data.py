@@ -71,6 +71,11 @@ def test_class_range_error():
             A = 0x05, 'Field A'
             B = 0x00, ..., 0x10, 'Field B'
 
+    with pytest.raises(ValueError, match=re.escape("Duplicated value in 'B' (5)")):
+        class Test6(hid_parser.data._Data):
+            A = 0x00, ..., 0x10, 'Field A'
+            B = 0x05, 'Field B'
+
 
 def test_description():
     class TestData(hid_parser.data._Data):

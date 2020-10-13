@@ -64,6 +64,10 @@ class _DataMeta(type):
                     if num in dic['_single']:
                         raise ValueError(f"Duplicated value in '{attr}' ({num})")
 
+                    for nmin, nmax, _ in dic['_range']:
+                        if nmin <= num <= nmax:
+                            raise ValueError(f"Duplicated value in '{attr}' ({num})")
+
                     dic[attr] = num
                     dic['_single'][num] = desc, sub
                 elif len(data[attr]) == 5:  # range
