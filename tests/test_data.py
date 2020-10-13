@@ -36,43 +36,43 @@ def test_class():
 
 def test_class_single_error():
     with pytest.raises(TypeError, match="First element of 'A' should be an int"):
-        class Test1(hid_parser.data._Data):
+        class TestFirst(hid_parser.data._Data):
             A = 'test', 'Field A'
 
     with pytest.raises(TypeError, match="Second element of 'A' should be a string"):
-        class Test2(hid_parser.data._Data):
+        class TestSecond(hid_parser.data._Data):
             A = 0x00, 0x01
 
     with pytest.raises(ValueError, match=re.escape("Duplicated value in 'B' (0)")):
-        class Test3(hid_parser.data._Data):
+        class TestDuplicated(hid_parser.data._Data):
             A = 0x00, 'Field A'
             B = 0x00, 'Field B'
 
 
 def test_class_range_error():
     with pytest.raises(TypeError, match="Second element of 'A' should be an ellipsis (...)"):
-        class Test1(hid_parser.data._Data):
+        class TestEllipsis(hid_parser.data._Data):
             A = 0x00, 0x01, 0x02, 'Field A'
 
     with pytest.raises(TypeError, match="First element of 'A' should be an int"):
-        class Test2(hid_parser.data._Data):
+        class TestFirst(hid_parser.data._Data):
             A = 'test', ..., 0x00, 'Field A'
 
     with pytest.raises(TypeError, match="Third element of 'A' should be an int"):
-        class Test3(hid_parser.data._Data):
+        class TestThird(hid_parser.data._Data):
             A = 0x00, ..., 'test', 'Field A'
 
     with pytest.raises(TypeError, match="Fourth element of 'A' should be a string"):
-        class Test4(hid_parser.data._Data):
+        class TestFourth(hid_parser.data._Data):
             A = 0x00, ..., 0x01, 0x00
 
     with pytest.raises(ValueError, match=re.escape("Duplicated value in 'B' (5)")):
-        class Test5(hid_parser.data._Data):
+        class TestDuplicatedSingleFirst(hid_parser.data._Data):
             A = 0x05, 'Field A'
             B = 0x00, ..., 0x10, 'Field B'
 
     with pytest.raises(ValueError, match=re.escape("Duplicated value in 'B' (5)")):
-        class Test6(hid_parser.data._Data):
+        class TestDuplicatedRangeFirst(hid_parser.data._Data):
             A = 0x00, ..., 0x10, 'Field A'
             B = 0x05, 'Field B'
 
