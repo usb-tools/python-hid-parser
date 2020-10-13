@@ -59,7 +59,7 @@ class _DataMeta(type):
                     if not isinstance(num, int):
                         raise TypeError(f"First element of '{attr}' should be an int")
                     if not isinstance(desc, str):
-                        raise TypeError(f"Second element of '{attr}' should be an int")
+                        raise TypeError(f"Second element of '{attr}' should be a string")
 
                     if num in dic['_single']:
                         raise ValueError(f"Duplicated value in '{attr}' ({num})")
@@ -76,7 +76,7 @@ class _DataMeta(type):
                     if not isinstance(nmax, int):
                         raise TypeError(f"Third element of '{attr}' should be an int")
                     if not isinstance(desc, str):
-                        raise TypeError(f"Fourth element of '{attr}' should be an int")
+                        raise TypeError(f"Fourth element of '{attr}' should be a string")
 
                     for num in dic['_single']:
                         if nmin <= num <= nmax:
