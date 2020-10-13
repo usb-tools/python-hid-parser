@@ -88,6 +88,9 @@ class _DataMeta(type):
 
                     dic['_range'].append((nmin, nmax, (desc, sub)))
 
+                else:
+                    raise ValueError(f'Invalid field: {attr}')
+
         return super().__new__(mcs, name, bases, dic)
 
 

@@ -50,6 +50,10 @@ def test_class_single_error():
 
 
 def test_class_range_error():
+    with pytest.raises(ValueError, match='Invalid field: A'):
+        class TestInvalid(hid_parser.data._Data):
+            A = ()
+
     with pytest.raises(TypeError, match="Second element of 'A' should be an ellipsis (...)"):
         class TestEllipsis(hid_parser.data._Data):
             A = 0x00, 0x01, 0x02, 'Field A'
