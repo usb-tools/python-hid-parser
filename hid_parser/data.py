@@ -1,5 +1,7 @@
 # SPDX-License-Identifier: MIT
 
+import enum
+
 from typing import Any, Dict, List, Optional, Tuple
 
 
@@ -129,6 +131,28 @@ class _Data(metaclass=_DataMeta):
             raise ValueError('Sub-data not available')
 
         return subdata
+
+
+class UsageTypes(enum.Enum):
+    # controls
+    LINEAR_CONTROL = LC = 0
+    ON_OFF_CONTROL = OOC = 1
+    MOMENTARY_CONTROL = MC = 2
+    ONE_SHOT_CONTROL = OSC = 3
+    RE_TRIGGER_CONTROL = RTC = 4
+    # data
+    SELECTOR = SEL = 5
+    STATIC_VALUE = SV = 6
+    STATIC_FLAG = SF = 7
+    DYNAMIC_FLAG = DF = 8
+    DYNAMIC_VALUE = DV = 9
+    # collection
+    NAMED_ARRAY = NARY = 10
+    COLLECTION_APPLICATION = CA = 11
+    COLLECTION_LOGICAL = CL = 12
+    COLLECTION_PHYSICAL = CP = 13
+    USAGE_SWITCH = US = 14
+    USAGE_MODIFIER = UM = 15
 
 
 class Collections(_Data):
