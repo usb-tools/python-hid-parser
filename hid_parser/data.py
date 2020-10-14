@@ -101,7 +101,7 @@ class _Data(metaclass=_DataMeta):
     This class provides a get_description method to get data out of _single and _range.
     See the _DataMeta documentation for more information.
     '''
-    _DATA = Tuple[str, Optional['_Data']]
+    _DATA = Tuple[str, Optional[Any]]
     _single: Dict[int, _DATA]
     _range: List[Tuple[int, int, _DATA]]
 
@@ -124,7 +124,7 @@ class _Data(metaclass=_DataMeta):
         return cls._get_data(num)[0]
 
     @classmethod
-    def get_subdata(cls, num: Optional[int]) -> '_Data':
+    def get_subdata(cls, num: Optional[int]) -> Any:
         subdata = cls._get_data(num)[1]
 
         if not subdata:

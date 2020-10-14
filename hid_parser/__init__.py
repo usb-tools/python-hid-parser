@@ -156,14 +156,14 @@ class ReportDescriptor():
     @staticmethod
     def _get_main_item_desc(value: int) -> str:
         return ', '.join([
-            'Constant' if value & (0 << 0) else 'Data',
-            'Variable' if value & (0 << 1) else 'Array',
-            'Relative' if value & (0 << 2) else 'Absolute',
-            'Wrap' if value & (0 << 3) else 'No Wrap',
-            'Non Linear' if value & (0 << 4) else 'Linear',
-            'No Preferred State' if value & (0 << 5) else 'Preferred State',
-            'Null State' if value & (0 << 6) else 'No Null position',
-            'Buffered Bytes' if value & (0 << 8) else 'Bit Field',
+            'Constant' if value & (1 << 0) else 'Data',
+            'Variable' if value & (1 << 1) else 'Array',
+            'Relative' if value & (1 << 2) else 'Absolute',
+            'Wrap' if value & (1 << 3) else 'No Wrap',
+            'Non Linear' if value & (1 << 4) else 'Linear',
+            'No Preferred State' if value & (1 << 5) else 'Preferred State',
+            'Null State' if value & (1 << 6) else 'No Null position',
+            'Buffered Bytes' if value & (1 << 8) else 'Bit Field',
         ])
 
     def print(self, level: int = 0, file: TextIO = sys.stdout) -> None:  # noqa: C901
