@@ -13,7 +13,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python: [3.6, 3.7, 3.8]
+        python: [3.7, 3.8]
 
     steps:
     - name: Checkout
@@ -43,6 +43,8 @@ jobs:
 
     - name: Setup Python
       uses: actions/setup-python@v2
+      with:
+        python-version: 3.7
 
     - name: Run pre-commit
       uses: pre-commit/action@v2.0.0
