@@ -9,7 +9,7 @@ from typing import Any, Dict, Iterable, List, Optional, Sequence, TextIO, Tuple,
 
 if sys.version_info >= (3, 8):
     from typing import Literal
-else:
+else:  # pragma: no cover
     from typing_extensions import Literal
 
 import hid_parser.data
