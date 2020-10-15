@@ -1,5 +1,7 @@
 # SPDX-License-Identifier: MIT
 
+from __future__ import annotations  # noqa:F407
+
 import functools
 import struct
 import sys
