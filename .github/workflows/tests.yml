@@ -1,0 +1,45 @@
+name: tests
+
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+    branches:
+      - master
+
+jobs:
+  pytest:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python: [3.7, 3.8, 3.9]
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Set up target Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: ${{ matrix.python }}
+
+      - name: Set up Python
+        uses: actions/setup-python@v2
+
+      - name: Install nox
+        run: |
+            pip install nox
+            nox --version
+
+      - name: Run tests
+        run: nox -s test-${{ matrix.python }}
+
+      - name: Send coverage report
+        uses: codecov/codecov-action@v1
+        env:
+          PYTHON: ${{ matrix.python }}
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          env_vars: PYTHON
