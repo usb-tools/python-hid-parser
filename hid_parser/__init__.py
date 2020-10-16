@@ -86,7 +86,7 @@ class BitNumber(int):
         if self.byte == 0:
             return self._value
 
-        return self._value % self.byte
+        return self._value % (self.byte * 8)
 
     @staticmethod
     def _param_repr(value: int, unit: str) -> str:
