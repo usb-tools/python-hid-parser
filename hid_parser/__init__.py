@@ -5,6 +5,7 @@ from __future__ import annotations  # noqa:F407
 import functools
 import struct
 import sys
+import textwrap
 import typing
 import warnings
 
@@ -362,6 +363,20 @@ class ArrayItem(MainItem):
                     ))
             except (KeyError, ValueError):
                 pass
+
+    def __repr__(self) -> str:
+        return textwrap.dedent('''
+            ArrayItem(
+                offset={}, size={},
+                usages=[
+                    {},
+                ],
+            )
+            ''').strip().format(
+                self.offset,
+                self.size,
+                ',\n'.join(repr(usage) for usage in self.usages),
+            )
 
     @property
     def usages(self) -> List[Usage]:
