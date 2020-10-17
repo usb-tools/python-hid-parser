@@ -5,6 +5,7 @@ from __future__ import annotations  # noqa:F407
 import functools
 import struct
 import sys
+import warnings
 
 from typing import Any, Dict, Iterable, List, Optional, Sequence, TextIO, Tuple, Union
 
@@ -18,6 +19,10 @@ import hid_parser.data
 
 
 __version__ = '0.0.2'
+
+
+class HIDComplienceWarning(Warning):
+    pass
 
 
 class Type():
@@ -288,6 +293,26 @@ class VariableItem(MainItem):
 
 
 class ArrayItem(MainItem):
+    _INCOMPATIBLE_TYPES = (
+        # variable types
+        hid_parser.data.UsageTypes.LINEAR_CONTROL,
+        hid_parser.data.UsageTypes.ON_OFF_CONTROL,
+        hid_parser.data.UsageTypes.MOMENTARY_CONTROL,
+        hid_parser.data.UsageTypes.ONE_SHOT_CONTROL,
+        hid_parser.data.UsageTypes.RE_TRIGGER_CONTROL,
+        hid_parser.data.UsageTypes.STATIC_VALUE,
+        hid_parser.data.UsageTypes.STATIC_FLAG,
+        hid_parser.data.UsageTypes.DYNAMIC_VALUE,
+        hid_parser.data.UsageTypes.DYNAMIC_FLAG,
+        # collection types
+        hid_parser.data.UsageTypes.NAMED_ARRAY,
+        hid_parser.data.UsageTypes.COLLECTION_APPLICATION,
+        hid_parser.data.UsageTypes.COLLECTION_LOGICAL,
+        hid_parser.data.UsageTypes.COLLECTION_PHYSICAL,
+        hid_parser.data.UsageTypes.USAGE_SWITCH,
+        hid_parser.data.UsageTypes.USAGE_MODIFIER,
+    )
+
     def __init__(
         self,
         offset: int,
@@ -301,6 +326,15 @@ class ArrayItem(MainItem):
     ):
         super().__init__(offset, size, flags, logical_min, logical_max, physical_min, physical_max)
         self._usages = usages
+
+        for usage in self._usages:
+            try:
+                if usage.usage_type in self._INCOMPATIBLE_TYPES:
+                    warnings.warn(HIDComplienceWarning(
+                        f'{usage} has incompatible usage type with an array item: {usage.usage_type}'
+                    ))
+            except (KeyError, ValueError):
+                pass
 
     @property
     def usages(self) -> List[Usage]:
