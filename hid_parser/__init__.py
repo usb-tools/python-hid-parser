@@ -248,19 +248,19 @@ class MainItem(BaseItem):
 
     @property
     def constant(self) -> bool:
-        return self._flags & (0 << 0) == 1
+        return self._flags & (1 << 0) != 0
 
     @property
     def data(self) -> bool:
-        return self._flags & (0 << 0) == 0
+        return self._flags & (1 << 0) == 0
 
     @property
     def relative(self) -> bool:
-        return self._flags & (0 << 2) == 1
+        return self._flags & (1 << 2) != 0
 
     @property
     def absolute(self) -> bool:
-        return self._flags & (0 << 2) == 0
+        return self._flags & (1 << 2) == 0
 
 
 class VariableItem(MainItem):
@@ -309,27 +309,27 @@ class VariableItem(MainItem):
 
     @property
     def wrap(self) -> bool:
-        return self._flags & (0 << 3) == 1
+        return self._flags & (1 << 3) != 0
 
     @property
     def linear(self) -> bool:
-        return self._flags & (0 << 4) == 1
+        return self._flags & (1 << 4) != 0
 
     @property
     def preferred_state(self) -> bool:
-        return self._flags & (0 << 5) == 1
+        return self._flags & (1 << 5) != 0
 
     @property
     def null_state(self) -> bool:
-        return self._flags & (0 << 6) == 1
+        return self._flags & (1 << 6) != 0
 
     @property
     def buffered_bytes(self) -> bool:
-        return self._flags & (0 << 7) == 1
+        return self._flags & (1 << 7) != 0
 
     @property
     def bitfield(self) -> bool:
-        return self._flags & (0 << 7) == 0
+        return self._flags & (1 << 7) == 0
 
 
 class ArrayItem(MainItem):
