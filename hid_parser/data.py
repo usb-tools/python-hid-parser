@@ -541,15 +541,22 @@ class Led(_Data):
 
 
 class Button(_Data):
+    _USAGE_TYPES = (
+        UsageTypes.SEL,
+        UsageTypes.OOC,
+        UsageTypes.MC,
+        UsageTypes.OSC,
+    )
+
     data = {
-        'NO_BUTTON': (0x0000, 'Button 1 (primary/trigger)'),
-        'BUTTON_1': (0x0001, 'Button 1 (primary/trigger)'),
-        'BUTTON_2': (0x0002, 'Button 2 (secondary)'),
-        'BUTTON_3': (0x0003, 'Button 3 (tertiary)'),
+        'NO_BUTTON': (0x0000, 'Button 1 (primary/trigger)', _USAGE_TYPES),
+        'BUTTON_1': (0x0001, 'Button 1 (primary/trigger)', _USAGE_TYPES),
+        'BUTTON_2': (0x0002, 'Button 2 (secondary)', _USAGE_TYPES),
+        'BUTTON_3': (0x0003, 'Button 3 (tertiary)', _USAGE_TYPES),
     }
 
     for _i in range(0x0004, 0xffff):
-        data[f'BUTTON_{_i}'] = _i, f'Button {_i}'
+        data[f'BUTTON_{_i}'] = _i, f'Button {_i}', _USAGE_TYPES
 
 
 class Consumer(_Data):
