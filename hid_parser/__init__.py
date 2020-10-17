@@ -5,6 +5,7 @@ from __future__ import annotations  # noqa:F407
 import functools
 import struct
 import sys
+import typing
 import warnings
 
 from typing import Any, Dict, Iterable, List, Optional, Sequence, TextIO, Tuple, Union
@@ -150,13 +151,19 @@ class Usage():
         return f'Usage(page={page_str}, usage={usage_str})'
 
     @property
-    def usage_type(self) -> hid_parser.data.UsageTypes:
-        typ = hid_parser.data.UsagePages.get_subdata(self.page).get_subdata(self.usage)
+    def usage_types(self) -> Tuple[hid_parser.data.UsageTypes]:
+        subdata = hid_parser.data.UsagePages.get_subdata(self.page).get_subdata(self.usage)
 
-        if not isinstance(typ, hid_parser.data.UsageTypes):
-            raise ValueError(f"Expecting UsageType but got '{type(typ)}'")
+        if isinstance(subdata, tuple):
+            types = subdata
+        else:
+            types = (subdata,)
 
-        return typ
+        for typ in types:
+            if not isinstance(typ, hid_parser.data.UsageTypes):
+                raise ValueError(f"Expecting usage type but got '{type(typ)}'")
+
+        return typing.cast(Tuple[hid_parser.data.UsageTypes], types)
 
 
 class BaseItem():
@@ -271,9 +278,9 @@ class VariableItem(MainItem):
         self._usage = usage
 
         try:
-            if self._usage.usage_type in self._INCOMPATIBLE_TYPES:
+            if all(usage_type in self._INCOMPATIBLE_TYPES for usage_type in usage.usage_types):
                 warnings.warn(HIDComplienceWarning(
-                    f'{usage} has incompatible usage type with a variable item: {usage.usage_type}'
+                    f'{usage} has no compatible usage types with a variable item'
                 ))
         except (KeyError, ValueError):
             pass
@@ -349,9 +356,9 @@ class ArrayItem(MainItem):
 
         for usage in self._usages:
             try:
-                if usage.usage_type in self._INCOMPATIBLE_TYPES:
+                if all(usage_type in self._INCOMPATIBLE_TYPES for usage_type in usage.usage_types):
                     warnings.warn(HIDComplienceWarning(
-                        f'{usage} has incompatible usage type with an array item: {usage.usage_type}'
+                        f'{usage} has no compatible usage types with an array item'
                     ))
             except (KeyError, ValueError):
                 pass
