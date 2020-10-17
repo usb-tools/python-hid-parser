@@ -1,5 +1,7 @@
 # SPDX-License-Identifier: MIT
 
+import sys
+
 import pytest
 
 import hid_parser
@@ -12,6 +14,7 @@ def test_baseitem():
     assert item.size == hid_parser.BitNumber(2)
 
 
+@pytest.mark.skipif(sys.version_info < (3, 8), reason='repr behaves differently before 3.8')
 def test_baseitem_repr():
     assert repr(hid_parser.BaseItem(1, 2)) == 'BaseItem(offset=1bit, size=2bits)'
 
@@ -116,6 +119,7 @@ def test_variableitem():
     assert item.bitfield is False
 
 
+@pytest.mark.skipif(sys.version_info < (3, 8), reason='repr behaves differently before 3.8')
 def test_variableitem_repr():
     assert repr(hid_parser.VariableItem(1, 2, 0, hid_parser.Usage(0x0001, 0x0030), -1, 1)) == \
         'VariableItem(offset=1bit, size=2bits, usage=Usage(page=Generic Desktop Controls, usage=X))'
@@ -148,6 +152,7 @@ def test_arrayitem():
     assert item.usages == usages
 
 
+@pytest.mark.skipif(sys.version_info < (3, 8), reason='repr behaves differently before 3.8')
 def test_arrayitem_repr():
     usages = [
         hid_parser.Usage(0x0001, 0x0030),
