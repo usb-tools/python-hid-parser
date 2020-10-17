@@ -197,7 +197,7 @@ class GenericDesktopControls(_Data):
     VBRY = 0x44, 'Vbry', UsageTypes.DV
     VBRZ = 0x45, 'Vbrz', UsageTypes.DV
     VNO = 0x46, 'Vno', UsageTypes.DV
-    FEATURE_NOTIFICATION = 0x47, 'Feature Notification', UsageTypes.DV  # DF?
+    FEATURE_NOTIFICATION = 0x47, 'Feature Notification', (UsageTypes.DV, UsageTypes.DF)
     RESOLUTION_MULTIPLIER = 0x48, 'Resolution Multiplier', UsageTypes.DV
     SYSTEM_CONTROL = 0x80, 'System Control', UsageTypes.CA
     SYSTEM_POWER_CONTROL = 0x81, 'System Power Down', UsageTypes.OSC
