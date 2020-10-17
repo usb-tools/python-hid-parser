@@ -104,9 +104,9 @@ def test_range():
     for i in range(0x10, 0x20):
         assert data.get_description(i) == 'Field A'
 
-    with pytest.raises(KeyError, match='Value not found'):
+    with pytest.raises(KeyError, match='Data not found for index 0x09 in TestData'):
         data.get_subdata(0x09)
-    with pytest.raises(KeyError, match='Value not found'):
+    with pytest.raises(KeyError, match='Data not found for index 0x21 in TestData'):
         data.get_subdata(0x21)
 
 
@@ -134,9 +134,9 @@ def test_key_none():
 
     data = TestData()
 
-    with pytest.raises(KeyError, match='Value is not an int'):
+    with pytest.raises(KeyError, match='Data index is not an int'):
         data.get_description(None)
-    with pytest.raises(KeyError, match='Value is not an int'):
+    with pytest.raises(KeyError, match='Data index is not an int'):
         data.get_subdata(None)
 
 
@@ -146,9 +146,9 @@ def test_key_not_found():
 
     data = TestData()
 
-    with pytest.raises(KeyError, match='Value not found'):
+    with pytest.raises(KeyError, match='Data not found for index 0x00 in TestData'):
         data.get_description(0)
-    with pytest.raises(KeyError, match='Value not found'):
+    with pytest.raises(KeyError, match='Data not found for index 0x00 in TestData'):
         data.get_subdata(0)
 
 

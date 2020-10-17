@@ -108,7 +108,7 @@ class _Data(metaclass=_DataMeta):
     @classmethod
     def _get_data(cls, num: Optional[int]) -> _DATA:
         if num is None:
-            raise KeyError('Value is not an int')
+            raise KeyError('Data index is not an int')
 
         if num in cls._single:
             return cls._single[num]
@@ -117,7 +117,7 @@ class _Data(metaclass=_DataMeta):
             if nmin <= num <= nmax:
                 return data
 
-        raise KeyError('Value not found')
+        raise KeyError(f'Data not found for index 0x{num:02x} in {cls.__name__}')
 
     @classmethod
     def get_description(cls, num: Optional[int]) -> str:
