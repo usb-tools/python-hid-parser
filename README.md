@@ -51,3 +51,64 @@ PaddingItem(offset=3bits, size=5bits)
 VariableItem(offset=1byte, size=1byte, usage=Usage(page=Generic Desktop Controls, usage=X))
 VariableItem(offset=2bytes, size=1byte, usage=Usage(page=Generic Desktop Controls, usage=Y))
 ```
+
+```python
+>>> import hid_parser
+>>> vendor_command_rdesc_raw = [
+...     0x06, 0x00, 0xff,  # .Usage Page (Vendor Defined Page 1)  0
+...     0x09, 0x01,        # .Usage (Vendor Usage 1)              3
+...     0xa1, 0x01,        # .Collection (Application)            5
+...     0x85, 0x10,        # ..Report ID (16)                     7
+...     0x75, 0x08,        # ..Report Size (8)                    9
+...     0x95, 0x06,        # ..Report Count (6)                   11
+...     0x15, 0x00,        # ..Logical Minimum (0)                12
+...     0x26, 0xff, 0x00,  # ..Logical Maximum (255)              15
+...     0x09, 0x01,        # ..Usage (Vendor Usage 1)             18
+...     0x81, 0x00,        # ..Input (Data,Arr,Abs)               20
+...     0x09, 0x01,        # ..Usage (Vendor Usage 1)             22
+...     0x91, 0x00,        # ..Output (Data,Arr,Abs)              24
+...     0xc0,              # .End Collection                      26
+... ]
+>>> rdesc = hid_parser.ReportDescriptor(vendor_command_rdesc_raw)
+>>> rdesc.get_input_report_size(0x10)
+6bytes
+>>> for item in rdesc.get_input_items(0x10):
+...     print(item)
+...
+ArrayItem(
+    offset=0bits, size=1byte,
+    usages=[
+        Usage(page=Vendor Page, usage=0x0001),
+    ],
+)
+ArrayItem(
+    offset=1byte, size=1byte,
+    usages=[
+        Usage(page=Vendor Page, usage=0x0001),
+    ],
+)
+ArrayItem(
+    offset=2bytes, size=1byte,
+    usages=[
+        Usage(page=Vendor Page, usage=0x0001),
+    ],
+)
+ArrayItem(
+    offset=3bytes, size=1byte,
+    usages=[
+        Usage(page=Vendor Page, usage=0x0001),
+    ],
+)
+ArrayItem(
+    offset=4bytes, size=1byte,
+    usages=[
+        Usage(page=Vendor Page, usage=0x0001),
+    ],
+)
+ArrayItem(
+    offset=5bytes, size=1byte,
+    usages=[
+        Usage(page=Vendor Page, usage=0x0001),
+    ],
+)
+```
