@@ -76,6 +76,12 @@ class BitNumber(int):
     def __int__(self) -> int:
         return self._value
 
+    def __eq__(self, other: Any) -> bool:
+        try:
+            return self._value == int(other)
+        except:  # noqa: E722
+            return False
+
     @property
     def byte(self) -> int:
         '''
