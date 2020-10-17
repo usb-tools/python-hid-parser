@@ -384,11 +384,11 @@ class ArrayItem(MainItem):
                     {},
                 ],
             )
-            ''').strip().format(
-                self.offset,
-                self.size,
-                ',\n'.join(repr(usage) for usage in self.usages),
-            )
+        ''').strip().format(
+            self.offset,
+            self.size,
+            ',\n        '.join(repr(usage) for usage in self.usages),
+        )
 
     @property
     def usages(self) -> List[Usage]:
