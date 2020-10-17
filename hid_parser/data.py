@@ -373,7 +373,7 @@ class KeyboardKeypad(_Data):
     KEYBOARD_LOCKING_NUM_LOCK = 0x83, 'Keyboard Locking Num Lock', UsageTypes.SEL
     KEYBOARD_LOCKING_SCROLL_LOCK = 0x84, 'Keyboard Locking Scroll Lock', UsageTypes.SEL
     KEYPAD_COMMA = 0x85, 'Keypad Comma', UsageTypes.SEL
-    KEYPAD_EQUALS = 0x86, 'Keypad Equal Sign', UsageTypes.SEL
+    KEYPAD_EQUALS_SIGN = 0x86, 'Keypad Equal Sign', UsageTypes.SEL
     KEYBOARD_INTERNATIONAL1 = 0x87, 'Keyboard International1', UsageTypes.SEL
     KEYBOARD_INTERNATIONAL2 = 0x88, 'Keyboard International2', UsageTypes.SEL
     KEYBOARD_INTERNATIONAL3 = 0x89, 'Keyboard International3', UsageTypes.SEL
