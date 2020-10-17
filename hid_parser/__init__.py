@@ -118,7 +118,13 @@ class BitNumber(int):
 
 
 class Usage():
-    def __init__(self, page: Optional[int], usage: Optional[int], *, extended_usage: Optional[int] = None) -> None:
+    def __init__(
+        self,
+        page: Optional[int] = None,
+        usage: Optional[int] = None,
+        *,
+        extended_usage: Optional[int] = None
+    ) -> None:
         if extended_usage and page and usage:
             raise ValueError('You need to specify either the usage page and usage or the extended usage')
         if extended_usage is not None:
