@@ -199,8 +199,7 @@ class MainItem(BaseItem):
         physical_min: Optional[int] = None,
         physical_max: Optional[int] = None,
     ):
-        self._offset = BitNumber(offset)
-        self._size = BitNumber(size)
+        super().__init__(offset, size)
         self._flags = flags
         self._logical_min = logical_min
         self._logical_max = logical_max
