@@ -146,7 +146,7 @@ class Usage():
 
     @property
     def usage_type(self) -> hid_parser.data.UsageTypes:
-        typ = hid_parser.data.Collections.get_subdata(self.page).get_subdata(self.usage)
+        typ = hid_parser.data.UsagePages.get_subdata(self.page).get_subdata(self.usage)
 
         if not isinstance(typ, hid_parser.data.UsageTypes):
             raise ValueError(f"Expecting UsageType but got '{type(typ)}'")
