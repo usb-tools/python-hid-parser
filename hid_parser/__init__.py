@@ -244,6 +244,18 @@ class MainItem(BaseItem):
 
 
 class VariableItem(MainItem):
+    _INCOMPATIBLE_TYPES = (
+        # array types
+        hid_parser.data.UsageTypes.SELECTOR,
+        # collection types
+        hid_parser.data.UsageTypes.NAMED_ARRAY,
+        hid_parser.data.UsageTypes.COLLECTION_APPLICATION,
+        hid_parser.data.UsageTypes.COLLECTION_LOGICAL,
+        hid_parser.data.UsageTypes.COLLECTION_PHYSICAL,
+        hid_parser.data.UsageTypes.USAGE_SWITCH,
+        hid_parser.data.UsageTypes.USAGE_MODIFIER,
+    )
+
     def __init__(
         self,
         offset: int,
@@ -257,6 +269,14 @@ class VariableItem(MainItem):
     ):
         super().__init__(offset, size, flags, logical_min, logical_max, physical_min, physical_max)
         self._usage = usage
+
+        try:
+            if self._usage.usage_type in self._INCOMPATIBLE_TYPES:
+                warnings.warn(HIDComplienceWarning(
+                    f'{usage} has incompatible usage type with a variable item: {usage.usage_type}'
+                ))
+        except (KeyError, ValueError):
+            pass
 
     def __repr__(self) -> str:
         return f'VariableItem(offset={self.offset}, size={self.size}, usage={self.usage})'
