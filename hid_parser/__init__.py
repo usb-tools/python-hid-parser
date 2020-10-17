@@ -23,7 +23,7 @@ import hid_parser.data
 __version__ = '0.0.2'
 
 
-class HIDComplienceWarning(Warning):
+class HIDComplianceWarning(Warning):
     pass
 
 
@@ -280,7 +280,7 @@ class VariableItem(MainItem):
 
         try:
             if all(usage_type in self._INCOMPATIBLE_TYPES for usage_type in usage.usage_types):
-                warnings.warn(HIDComplienceWarning(
+                warnings.warn(HIDComplianceWarning(
                     f'{usage} has no compatible usage types with a variable item'
                 ))
         except (KeyError, ValueError):
@@ -358,7 +358,7 @@ class ArrayItem(MainItem):
         for usage in self._usages:
             try:
                 if all(usage_type in self._INCOMPATIBLE_TYPES for usage_type in usage.usage_types):
-                    warnings.warn(HIDComplienceWarning(
+                    warnings.warn(HIDComplianceWarning(
                         f'{usage} has no compatible usage types with an array item'
                     ))
             except (KeyError, ValueError):
