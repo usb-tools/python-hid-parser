@@ -149,6 +149,7 @@ class Usage():
             page_str = hid_parser.data.UsagePages.get_description(self.page)
         except KeyError:
             page_str = f'0x{self.page:04x}'
+            usage_str = f'0x{self.usage:04x}'
         else:
             try:
                 page = hid_parser.data.UsagePages.get_subdata(self.page)
