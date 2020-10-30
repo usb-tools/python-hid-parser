@@ -407,6 +407,12 @@ class ReportDescriptor():
     def __init__(self, data: Sequence[int]) -> None:
         self._data = data
 
+        for byte in data:
+            if byte < 0 or byte > 255:
+                raise InvalidReportDescriptor(
+                    f'A report descriptor should be represented by a list of bytes: found value {byte}'
+                )
+
         self._input: _ITEM_POOL = {}
         self._output: _ITEM_POOL = {}
         self._feature: _ITEM_POOL = {}
@@ -463,8 +469,12 @@ class ReportDescriptor():
             if size == 0:
                 data = None
             elif size == 1:
+                if i + 1 >= len(self.data):
+                    raise InvalidReportDescriptor(f'Invalid size: expecting >={i + 1}, got {len(self.data)}')
                 data = self.data[i+1]
             else:
+                if i + 1 + size >= len(self.data):
+                    raise InvalidReportDescriptor(f'Invalid size: expecting >={i + 1 + size}, got {len(self.data)}')
                 data = struct.unpack('<H', bytes(self.data[i+1:i+1+size]))[0]
 
             yield typ, tag, data
