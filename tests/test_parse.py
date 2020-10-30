@@ -258,6 +258,7 @@ def test_linux_hidpp_items():
 @hypothesis.given(st.lists(st.integers(), max_size=4096))
 @hypothesis.example(simple_mouse_rdesc)
 @hypothesis.example(linux_hidpp_rdesc)
+@pytest.mark.filterwarnings('ignore::hid_parser.HIDComplianceWarning')
 def test_hypothesis(rdesc):
     try:
         hid_parser.ReportDescriptor(rdesc)
