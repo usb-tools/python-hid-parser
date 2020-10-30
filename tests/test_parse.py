@@ -1,5 +1,7 @@
 # SPDX-License-Identifier: MIT
 
+import hypothesis
+import hypothesis.strategies as st
 import pytest
 
 import hid_parser
@@ -251,3 +253,13 @@ def test_linux_hidpp_items():
         assert int(item.size) == 8
         assert item.usages == usages
         offset += 8
+
+
+@hypothesis.given(st.lists(st.integers(), max_size=4096))
+@hypothesis.example(simple_mouse_rdesc)
+@hypothesis.example(linux_hidpp_rdesc)
+def test_hypothesis(rdesc):
+    try:
+        hid_parser.ReportDescriptor(rdesc)
+    except (hid_parser.InvalidReportDescriptor, NotImplementedError):
+        pass
