@@ -425,6 +425,18 @@ class ReportDescriptor():
     def data(self) -> Sequence[int]:
         return self._data
 
+    @property
+    def input_report_ids(self) -> List[Optional[int]]:
+        return list(self._input.keys())
+
+    @property
+    def output_report_ids(self) -> List[Optional[int]]:
+        return list(self._output.keys())
+
+    @property
+    def feature_report_ids(self) -> List[Optional[int]]:
+        return list(self._feature.keys())
+
     def get_input_items(self, report_id: Optional[int] = None) -> List[BaseItem]:
         return self._input[report_id]
 

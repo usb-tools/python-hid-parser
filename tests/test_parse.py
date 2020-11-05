@@ -188,6 +188,11 @@ def test_size(rdesc, report_id, expected):
 
 def test_simple_mouse_items():
     rdesc = hid_parser.ReportDescriptor(simple_mouse_rdesc)
+
+    assert rdesc.input_report_ids == [None]
+    assert rdesc.output_report_ids == []
+    assert rdesc.feature_report_ids == []
+
     items = rdesc.get_input_items()
 
     assert len(items) == 6
@@ -229,6 +234,24 @@ def test_simple_mouse_items():
 
 def test_linux_hidpp_items():
     rdesc = hid_parser.ReportDescriptor(linux_hidpp_rdesc)
+
+    assert rdesc.input_report_ids == [
+        0x01,
+        0x02,
+        0x10,
+        0x11,
+        0x20,
+        0x21,
+    ]
+    assert rdesc.output_report_ids == [
+        0x0e,
+        0x10,
+        0x11,
+        0x20,
+        0x21,
+    ]
+    assert rdesc.feature_report_ids == []
+
     items = rdesc.get_input_items(0x01)
 
     offset = 0
