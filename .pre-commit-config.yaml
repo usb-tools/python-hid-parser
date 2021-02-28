@@ -20,5 +20,5 @@ repos:
   rev: 3.8.3
   hooks:
   - id: flake8
-    additional_dependencies: ['flake8-bugbear', 'flake8-per-file-ignores']
+    additional_dependencies: ['flake8-per-file-ignores']
     language_version: python3.7
