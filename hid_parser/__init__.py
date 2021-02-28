@@ -437,35 +437,32 @@ class ReportDescriptor():
     def feature_report_ids(self) -> List[Optional[int]]:
         return list(self._feature.keys())
 
+    def _get_report_size(self, items: List[BaseItem]) -> BitNumber:
+        size = 0
+        for item in items:
+            size += item.size
+        return BitNumber(size)
+
     def get_input_items(self, report_id: Optional[int] = None) -> List[BaseItem]:
         return self._input[report_id]
 
     @functools.lru_cache(maxsize=16)
     def get_input_report_size(self, report_id: Optional[int] = None) -> BitNumber:
-        size = 0
-        for item in self.get_input_items(report_id):
-            size += item.size
-        return BitNumber(size)
+        return self._get_report_size(self.get_input_items(report_id))
 
     def get_output_items(self, report_id: Optional[int] = None) -> List[BaseItem]:
         return self._output[report_id]
 
     @functools.lru_cache(maxsize=16)
     def get_output_report_size(self, report_id: Optional[int] = None) -> BitNumber:
-        size = 0
-        for item in self.get_output_items(report_id):
-            size += item.size
-        return BitNumber(size)
+        return self._get_report_size(self.get_output_items(report_id))
 
     def get_feature_items(self, report_id: Optional[int] = None) -> List[BaseItem]:
         return self._feature[report_id]
 
     @functools.lru_cache(maxsize=16)
     def get_feature_report_size(self, report_id: Optional[int] = None) -> BitNumber:
-        size = 0
-        for item in self.get_feature_items(report_id):
-            size += item.size
-        return BitNumber(size)
+        return self._get_report_size(self.get_feature_items(report_id))
 
     def _iterate_raw(self) -> Iterable[Tuple[int, int, Optional[int]]]:
         i = 0
