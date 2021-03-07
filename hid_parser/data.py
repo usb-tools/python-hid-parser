@@ -155,6 +155,33 @@ class UsageTypes(enum.Enum):
     USAGE_MODIFIER = UM = 15
 
 
+UsageTypesControls = (
+    UsageTypes.LINEAR_CONTROL,
+    UsageTypes.ON_OFF_CONTROL,
+    UsageTypes.ONE_SHOT_CONTROL,
+    UsageTypes.RE_TRIGGER_CONTROL,
+)
+
+
+UsageTypesData = (
+    UsageTypes.SELECTOR,
+    UsageTypes.STATIC_VALUE,
+    UsageTypes.STATIC_FLAG,
+    UsageTypes.DYNAMIC_VALUE,
+    UsageTypes.DYNAMIC_FLAG,
+)
+
+
+UsageTypesCollection = (
+    UsageTypes.NAMED_ARRAY,
+    UsageTypes.COLLECTION_APPLICATION,
+    UsageTypes.COLLECTION_LOGICAL,
+    UsageTypes.COLLECTION_PHYSICAL,
+    UsageTypes.USAGE_SWITCH,
+    UsageTypes.USAGE_MODIFIER,
+)
+
+
 class Collections(_Data):
     PHYSICAL = 0x00, 'Physical'
     APPLICATION = 0x01, 'Application'
