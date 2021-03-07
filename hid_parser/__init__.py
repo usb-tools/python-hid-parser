@@ -23,7 +23,15 @@ import hid_parser.data
 __version__ = '0.0.3'
 
 
-class HIDComplianceWarning(Warning):
+class HIDWarning(Warning):
+    pass
+
+
+class HIDComplianceWarning(HIDWarning):
+    pass
+
+
+class HIDReportWarning(HIDWarning):
     pass
 
 
