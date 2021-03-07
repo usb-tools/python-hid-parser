@@ -150,6 +150,9 @@ class Usage():
             return False
         return self.page == other.page and self.usage == other.usage
 
+    def __hash__(self) -> int:
+        return self.usage << (2 * 8) + self.page
+
     def __repr__(self) -> str:
         try:
             page_str = hid_parser.data.UsagePages.get_description(self.page)
