@@ -11,6 +11,7 @@ Typed pure Python library to parse HID report descriptors
 #### Example
 
 ```python
+>>> import pprint
 >>> import hid_parser
 >>> simple_mouse_rdesc_raw = [
 ...     0x05, 0x01,  # .Usage Page (Generic Desktop)        0
@@ -55,9 +56,16 @@ VariableItem(offset=2bits, size=1bit, usage=Usage(page=Button, usage=Button 3 (t
 PaddingItem(offset=3bits, size=5bits)
 VariableItem(offset=1byte, size=1byte, usage=Usage(page=Generic Desktop Controls, usage=X))
 VariableItem(offset=2bytes, size=1byte, usage=Usage(page=Generic Desktop Controls, usage=Y))
+>>> pprint.pprint(rdesc.parse_input_report([0b10100000, 0x50, 0x60]))
+{Usage(page=Button, usage=Button 2 (secondary)): False,
+ Usage(page=Button, usage=Button 3 (tertiary)): True,
+ Usage(page=Button, usage=Button 1 (primary/trigger)): True,
+ Usage(page=Generic Desktop Controls, usage=X): 80,
+ Usage(page=Generic Desktop Controls, usage=Y): 96}
 ```
 
 ```python
+>>> import pprint
 >>> import hid_parser
 >>> keyboard_rdesc_raw = [
 ...     0x05, 0x01,        # Usage Page (Generic Desktop)        0
@@ -114,9 +122,22 @@ ArrayItem(
         Usage(page=Keyboard/Keypad, usage=0x00ff),
     ],
 )
+>>> pprint.pprint(rdesc.parse_input_report([0b10100101, 0x00, 0x04, 0x05, 0x06, 0x00, 0x00, 0x00]))
+{Usage(page=Keyboard/Keypad, usage=Keyboard Left GUI): 0,
+ Usage(page=Keyboard/Keypad, usage=Keyboard LeftAlt): 1,
+ Usage(page=Keyboard/Keypad, usage=Keyboard RightControl): 0,
+ Usage(page=Keyboard/Keypad, usage=Keyboard RightShift): 1,
+ Usage(page=Keyboard/Keypad, usage=Keyboard RightAlt): 0,
+ Usage(page=Keyboard/Keypad, usage=Keyboard Right GUI): 1,
+ Usage(page=Keyboard/Keypad, usage=Keyboard a and A): True,
+ Usage(page=Keyboard/Keypad, usage=Keyboard b and B): True,
+ Usage(page=Keyboard/Keypad, usage=Keyboard c and C): True,
+ Usage(page=Keyboard/Keypad, usage=Keyboard LeftShift): 0,
+ Usage(page=Keyboard/Keypad, usage=Keyboard LeftControl): 1}
 ```
 
 ```python
+>>> import pprint
 >>> import hid_parser
 >>> vendor_command_rdesc_raw = [
 ...     0x06, 0x00, 0xff,  # .Usage Page (Vendor Defined Page 1)  0
@@ -145,4 +166,11 @@ ArrayItem(
         Usage(page=Vendor Page, usage=0x0001),
     ],
 )
+>>> pprint.pprint(rdesc.parse_input_report([0x10, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08]))
+{Usage(page=Vendor Page, usage=0x0001): 257,
+ Usage(page=Vendor Page, usage=0x0002): 514,
+ Usage(page=Vendor Page, usage=0x0003): 771,
+ Usage(page=Vendor Page, usage=0x0004): 1028,
+ Usage(page=Vendor Page, usage=0x0005): 1285,
+ Usage(page=Vendor Page, usage=0x0006): 1542}
 ```
