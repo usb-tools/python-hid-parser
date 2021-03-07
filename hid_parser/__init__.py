@@ -534,6 +534,18 @@ class ReportDescriptor():
         item: BaseItem
         is_array = flags & (1 << 1) == 0  # otherwise variable
 
+        '''
+        HID 1.11, 6.2.2.9 says reports can be byte aligned by declaring a
+        main item without usage. A main item can have multiple usages, as I
+        interpret it, items are only considered padding when they have NO
+        usages.
+        '''
+        if len(usages) == 0 or not usages:
+            for _ in range(report_count):
+                item = PaddingItem(self.__offset[report_id], report_size)
+                self._append_item(self.__offset, pool, report_id, item)
+            return
+
         if is_array:
             print('appending array, report_count', report_count)
             item = ArrayItem(
@@ -546,19 +558,7 @@ class ReportDescriptor():
             )
             self._append_item(pool, report_id, item)
         else:
-            '''
-            HID 1.11, 6.2.2.9 says reports can be byte aligned by declaring a
-            main item without usage. A main item can have multiple usages, as I
-            interpret it, items are only considered padding when they have NO
-            usages.
-            '''
-            if len(usages) == 0:
-                for _ in range(report_count):
-                    item = PaddingItem(self.__offset[report_id], report_size)
-                    self._append_item(pool, report_id, item)
-                return
-
-            elif len(usages) != report_count:
+            if len(usages) != report_count:
                 raise InvalidReportDescriptor(f'Expecting {report_count} usages but got {len(usages)}')
 
             for usage in usages:
