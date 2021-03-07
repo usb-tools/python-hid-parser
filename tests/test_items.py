@@ -147,7 +147,7 @@ def test_arrayitem():
         hid_parser.Usage(0x0001, 0x0031),
     ]
 
-    item = hid_parser.ArrayItem(0, 0, 0, usages, -1, 1)
+    item = hid_parser.ArrayItem(0, 0, 0, 1, usages, -1, 1)
 
     assert item.usages == usages
 
@@ -158,10 +158,9 @@ def test_arrayitem_repr():
         hid_parser.Usage(0x0001, 0x0030),
         hid_parser.Usage(0x0001, 0x0031),
     ]
-    print(repr(hid_parser.ArrayItem(1, 2, 0, usages, -1, 1)))
-    assert repr(hid_parser.ArrayItem(1, 2, 0, usages, -1, 1)) == (
+    assert repr(hid_parser.ArrayItem(1, 2, 10, 0, usages, -1, 1)) == (
         'ArrayItem(\n'
-        '    offset=1bit, size=2bits,\n'
+        '    offset=1bit, size=2bits, count=10,\n'
         '    usages=[\n'
         '        Usage(page=Generic Desktop Controls, usage=X),\n'
         '        Usage(page=Generic Desktop Controls, usage=Y),\n'
@@ -177,13 +176,13 @@ def test_arrayitem_compliance():
     ]
 
     with pytest.warns(hid_parser.HIDComplianceWarning):
-        hid_parser.ArrayItem(1, 2, 0, usages, -1, 1)
+        hid_parser.ArrayItem(1, 2, 1, 0, usages, -1, 1)
 
     with pytest.warns(None):
-        hid_parser.ArrayItem(1, 2, 0, usages, -1, 1)
+        hid_parser.ArrayItem(1, 2, 1, 0, usages, -1, 1)
 
     with pytest.warns(None):
-        hid_parser.ArrayItem(1, 2, 0, usages, -1, 1)
+        hid_parser.ArrayItem(1, 2, 1, 0, usages, -1, 1)
 
     with pytest.warns(None):
-        hid_parser.ArrayItem(1, 2, 0, usages, -1, 1)
+        hid_parser.ArrayItem(1, 2, 1, 0, usages, -1, 1)

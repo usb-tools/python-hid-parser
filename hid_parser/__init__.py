@@ -368,6 +368,7 @@ class ArrayItem(MainItem):
         self,
         offset: int,
         size: int,
+        count: int,
         flags: int,
         usages: List[Usage],
         logical_min: int,
@@ -376,6 +377,7 @@ class ArrayItem(MainItem):
         physical_max: Optional[int] = None,
     ):
         super().__init__(offset, size, flags, logical_min, logical_max, physical_min, physical_max)
+        self._count = count
         self._usages = usages
         self._page = self._usages[0].page if usages else None
 
@@ -393,7 +395,7 @@ class ArrayItem(MainItem):
     def __repr__(self) -> str:
         return textwrap.dedent('''
             ArrayItem(
-                offset={}, size={},
+                offset={}, size={}, count={},
                 usages=[
                     {},
                 ],
@@ -401,8 +403,13 @@ class ArrayItem(MainItem):
         ''').strip().format(
             self.offset,
             self.size,
+            self.count,
             ',\n        '.join(repr(usage) for usage in self.usages),
         )
+
+    @property
+    def count(self) -> int:
+        return self._count
 
     @property
     def usages(self) -> List[Usage]:
@@ -454,7 +461,10 @@ class ReportDescriptor():
     def _get_report_size(self, items: List[BaseItem]) -> BitNumber:
         size = 0
         for item in items:
-            size += item.size
+            if isinstance(item, ArrayItem):
+                size += item.size * item.count
+            else:
+                size += item.size
         return BitNumber(size)
 
     def get_input_items(self, report_id: Optional[int] = None) -> List[BaseItem]:
@@ -525,15 +535,16 @@ class ReportDescriptor():
         is_array = flags & (1 << 1) == 0  # otherwise variable
 
         if is_array:
-            for _ in range(report_count):
-                item = ArrayItem(
-                    offset=self.__offset[report_id],
-                    size=report_size,
-                    usages=usages,
-                    flags=flags,
-                    **data,
-                )
-                self._append_item(pool, report_id, item)
+            print('appending array, report_count', report_count)
+            item = ArrayItem(
+                offset=self.__offset[report_id],
+                size=report_size,
+                usages=usages,
+                count=report_count,
+                flags=flags,
+                **data,
+            )
+            self._append_item(pool, report_id, item)
         else:
             '''
             HID 1.11, 6.2.2.9 says reports can be byte aligned by declaring a

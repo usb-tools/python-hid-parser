@@ -81,37 +81,7 @@ VariableItem(offset=2bytes, size=1byte, usage=Usage(page=Generic Desktop Control
 ...     print(item)
 ...
 ArrayItem(
-    offset=0bits, size=1byte,
-    usages=[
-        Usage(page=Vendor Page, usage=0x0001),
-    ],
-)
-ArrayItem(
-    offset=1byte, size=1byte,
-    usages=[
-        Usage(page=Vendor Page, usage=0x0001),
-    ],
-)
-ArrayItem(
-    offset=2bytes, size=1byte,
-    usages=[
-        Usage(page=Vendor Page, usage=0x0001),
-    ],
-)
-ArrayItem(
-    offset=3bytes, size=1byte,
-    usages=[
-        Usage(page=Vendor Page, usage=0x0001),
-    ],
-)
-ArrayItem(
-    offset=4bytes, size=1byte,
-    usages=[
-        Usage(page=Vendor Page, usage=0x0001),
-    ],
-)
-ArrayItem(
-    offset=5bytes, size=1byte,
+    offset=0bits, size=1byte, count=6,
     usages=[
         Usage(page=Vendor Page, usage=0x0001),
     ],
