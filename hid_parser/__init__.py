@@ -377,8 +377,11 @@ class ArrayItem(MainItem):
     ):
         super().__init__(offset, size, flags, logical_min, logical_max, physical_min, physical_max)
         self._usages = usages
+        self._page = self._usages[0].page if usages else None
 
         for usage in self._usages:
+            if usage.page != self._page:
+                raise ValueError(f'Mismatching usage page in usage: {usage} (expecting {self._usages[0]})')
             try:
                 if all(usage_type in self._INCOMPATIBLE_TYPES for usage_type in usage.usage_types):
                     warnings.warn(HIDComplianceWarning(
