@@ -438,8 +438,6 @@ class ReportDescriptor():
         self._output: _ITEM_POOL = {}
         self._feature: _ITEM_POOL = {}
 
-        self.__offset: Dict[Optional[int], int] = {}
-
         self._parse()
 
     @property
@@ -514,8 +512,14 @@ class ReportDescriptor():
 
             i += size + 1
 
-    def _append_item(self, pool: _ITEM_POOL, report_id: Optional[int], item: BaseItem) -> None:
-        self.__offset[report_id] += item.size
+    def _append_item(
+        self,
+        offset_list: Dict[Optional[int], int],
+        pool: _ITEM_POOL,
+        report_id: Optional[int],
+        item: BaseItem,
+    ) -> None:
+        offset_list[report_id] += item.size
         if report_id in pool:
             pool[report_id].append(item)
         else:
@@ -523,6 +527,7 @@ class ReportDescriptor():
 
     def _append_items(
         self,
+        offset_list: Dict[Optional[int], int],
         pool: _ITEM_POOL,
         report_id: Optional[int],
         report_count: int,
@@ -542,37 +547,42 @@ class ReportDescriptor():
         '''
         if len(usages) == 0 or not usages:
             for _ in range(report_count):
-                item = PaddingItem(self.__offset[report_id], report_size)
-                self._append_item(self.__offset, pool, report_id, item)
+                item = PaddingItem(offset_list[report_id], report_size)
+                self._append_item(offset_list, pool, report_id, item)
             return
 
         if is_array:
-            print('appending array, report_count', report_count)
             item = ArrayItem(
-                offset=self.__offset[report_id],
+                offset=offset_list[report_id],
                 size=report_size,
                 usages=usages,
                 count=report_count,
                 flags=flags,
                 **data,
             )
-            self._append_item(pool, report_id, item)
+            self._append_item(offset_list, pool, report_id, item)
         else:
             if len(usages) != report_count:
                 raise InvalidReportDescriptor(f'Expecting {report_count} usages but got {len(usages)}')
 
             for usage in usages:
                 item = VariableItem(
-                    offset=self.__offset[report_id],
+                    offset=offset_list[report_id],
                     size=report_size,
                     usage=usage,
                     flags=flags,
                     **data,
                 )
-                self._append_item(pool, report_id, item)
+                self._append_item(offset_list, pool, report_id, item)
 
     def _parse(self, level: int = 0, file: TextIO = sys.stdout) -> None:  # noqa: C901
-        self.__offset = {
+        offset_input: Dict[Optional[int], int] = {
+            None: 0,
+        }
+        offset_output: Dict[Optional[int], int] = {
+            None: 0,
+        }
+        offset_feature: Dict[Optional[int], int] = {
             None: 0,
         }
         report_id: Optional[int] = None
@@ -604,6 +614,7 @@ class ReportDescriptor():
                     if data is None:
                         raise InvalidReportDescriptor('Invalid input item')
                     self._append_items(
+                        offset_input,
                         self._input,
                         report_id,
                         report_count,
@@ -617,6 +628,7 @@ class ReportDescriptor():
                     if data is None:
                         raise InvalidReportDescriptor('Invalid output item')
                     self._append_items(
+                        offset_output,
                         self._output,
                         report_id,
                         report_count,
@@ -630,6 +642,7 @@ class ReportDescriptor():
                     if data is None:
                         raise InvalidReportDescriptor('Invalid feature item')
                     self._append_items(
+                        offset_feature,
                         self._feature,
                         report_id,
                         report_count,
@@ -671,8 +684,9 @@ class ReportDescriptor():
                         raise InvalidReportDescriptor('Tried to set a report ID in a report that does not use them')
                     report_id = data
                     # initialize the item offset for this report ID
-                    if report_id not in self.__offset:
-                        self.__offset[report_id] = 0
+                    for offset_list in (offset_input, offset_output, offset_feature):
+                        if report_id not in offset_list:
+                            offset_list[report_id] = 0
 
                 elif tag == TagGlobal.REPORT_COUNT:
                     report_count = data
