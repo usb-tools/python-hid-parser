@@ -9,7 +9,7 @@ import textwrap
 import typing
 import warnings
 
-from typing import Any, Dict, Iterable, List, Optional, Sequence, TextIO, Tuple, Union
+from typing import Any, Dict, Iterable, Iterator, List, Optional, Sequence, TextIO, Tuple, Union
 
 
 if sys.version_info >= (3, 8):
@@ -75,6 +75,43 @@ class TagLocal():
     STRING_MINIMUM = 0b1000
     STRING_MAXIMUM = 0b1001
     DELIMITER = 0b1010
+
+
+def _data_bit_shift(data: Sequence[int], offset: int, length: int) -> Sequence[int]:
+    if not length > 0:
+        raise ValueError(f'Invalid specified length: {length}')
+
+    left_extra = offset % 8
+    right_extra = 8 - (offset + length) % 8
+    start_offset = offset // 8
+    end_offset = (offset + length - 1) // 8
+    byte_length = (length - 1) // 8 + 1
+
+    if not end_offset < len(data):
+        raise ValueError(f'Invalid data length: {len(data)} (expecting {end_offset + 1})')
+
+    shifted = [0] * byte_length
+
+    if right_extra == 8:
+        right_extra = 0
+
+    i = end_offset
+    shifted_offset = byte_length - 1
+    while shifted_offset >= 0:
+        shifted[shifted_offset] = data[i] >> right_extra
+
+        if i - start_offset >= 0:
+            shifted[shifted_offset] |= (data[i - 1] & (0xff >> (8 - right_extra))) << (8 - right_extra)
+
+        shifted_offset -= 1
+        i -= 1
+
+    shifted[0] &= 0xff >> ((left_extra + right_extra) % 8)
+
+    if not len(shifted) == byte_length:
+        raise ValueError('Invalid data')
+
+    return shifted
 
 
 class BitNumber(int):
@@ -189,6 +226,69 @@ class Usage():
                 raise ValueError(f"Expecting usage type but got '{type(typ)}'")
 
         return typing.cast(Tuple[hid_parser.data.UsageTypes], types)
+
+
+class UsageValue():
+    def __init__(self, item: MainItem, value: int):
+        self._item = item
+        self._value = value
+
+    def __int__(self) -> int:
+        return self.value
+
+    def __repr__(self) -> str:
+        return repr(self.value)
+
+    @property
+    def value(self) -> Union[int, bool]:
+        return self._value
+
+    @property
+    def constant(self) -> bool:
+        return self._item.constant
+
+    @property
+    def data(self) -> bool:
+        return self._item.data
+
+    @property
+    def relative(self) -> bool:
+        return self._item.relative
+
+    @property
+    def absolute(self) -> bool:
+        return self._item.absolute
+
+
+class VendorUsageValue(UsageValue):
+    def __init__(
+        self,
+        item: MainItem,
+        *,
+        value: Optional[int] = None,
+        value_list: Optional[List[int]] = None,
+    ):
+        self._item = item
+        if value:
+            self._list = [value]
+        elif value_list:
+            self._list = value_list
+        else:
+            self._list = []
+
+    def __int__(self) -> int:
+        return self.value
+
+    def __iter__(self) -> Iterator[int]:
+        return iter(self.list)
+
+    @property
+    def value(self) -> Union[int, bool]:
+        return int.from_bytes(self._list, byteorder='little')
+
+    @property
+    def list(self) -> List[int]:
+        return self._list
 
 
 class BaseItem():
@@ -312,6 +412,30 @@ class VariableItem(MainItem):
     def __repr__(self) -> str:
         return f'VariableItem(offset={self.offset}, size={self.size}, usage={self.usage})'
 
+    def parse(self, data: Sequence[int]) -> UsageValue:
+        data = _data_bit_shift(data, self.offset, self.size)
+
+        if (
+            hid_parser.data.UsageTypes.LINEAR_CONTROL in self.usage.usage_types
+            or any(
+                usage_type in hid_parser.data.UsageTypesData
+                and usage_type != hid_parser.data.UsageTypes.SELECTOR
+                for usage_type in self.usage.usage_types
+            )
+        ):  # int
+            value = int.from_bytes(data, byteorder='little')
+        elif (
+            hid_parser.data.UsageTypes.ON_OFF_CONTROL in self.usage.usage_types
+            and not self.preferred_state
+            and self.logical_min == -1
+            and self.logical_max == 1
+        ):  # bool - -1 is false
+            value = int.from_bytes(data, byteorder='little') == 1
+        else:  # bool
+            value = bool.from_bytes(data, byteorder='little')
+
+        return UsageValue(self, value)
+
     @property
     def usage(self) -> Usage:
         return self._usage
@@ -363,6 +487,9 @@ class ArrayItem(MainItem):
         hid_parser.data.UsageTypes.USAGE_SWITCH,
         hid_parser.data.UsageTypes.USAGE_MODIFIER,
     )
+    _IGNORE_USAGE_VALUES = (
+        (hid_parser.data.UsagePages.KEYBOARD_KEYPAD_PAGE, hid_parser.data.KeyboardKeypad.NO_EVENT),
+    )
 
     def __init__(
         self,
@@ -392,6 +519,11 @@ class ArrayItem(MainItem):
             except (KeyError, ValueError):
                 pass
 
+        self._ignore_usages: List[Usage] = []
+        for page, usage_id in self._IGNORE_USAGE_VALUES:
+            assert isinstance(page, int) and isinstance(usage_id, int)
+            self._ignore_usages.append(Usage(page, usage_id))
+
     def __repr__(self) -> str:
         return textwrap.dedent('''
             ArrayItem(
@@ -406,6 +538,36 @@ class ArrayItem(MainItem):
             self.count,
             ',\n        '.join(repr(usage) for usage in self.usages),
         )
+
+    def parse(self, data: Sequence[int]) -> Dict[Usage, UsageValue]:
+        usage_values: Dict[Usage, UsageValue] = {}
+
+        for i in range(self.count):
+            aligned_data = _data_bit_shift(data, self.offset + i*8, self.size)
+            usage = Usage(self._page, int.from_bytes(aligned_data, byteorder='little'))
+
+            if usage in self._ignore_usages:
+                continue
+
+            # vendor usages don't have usage any standard type - just save the raw data
+            if usage.page in hid_parser.data.UsagePages.VENDOR_PAGE:
+                if usage not in usage_values:
+                    usage_values[usage] = VendorUsageValue(
+                        self,
+                        value=int.from_bytes(aligned_data, byteorder='little'),
+                    )
+                typing.cast(VendorUsageValue, usage_values[usage]).list.append(
+                    int.from_bytes(aligned_data, byteorder='little')
+                )
+                continue
+
+            if usage in self._usages and all(
+                usage_type not in self._INCOMPATIBLE_TYPES
+                for usage_type in usage.usage_types
+            ):
+                usage_values[usage] = UsageValue(self, True)
+
+        return usage_values
 
     @property
     def count(self) -> int:
@@ -485,6 +647,38 @@ class ReportDescriptor():
     @functools.lru_cache(maxsize=16)
     def get_feature_report_size(self, report_id: Optional[int] = None) -> BitNumber:
         return self._get_report_size(self.get_feature_items(report_id))
+
+    def _parse_report_items(self, items: List[BaseItem], data: Sequence[int]) -> Dict[Usage, UsageValue]:
+        parsed: Dict[Usage, UsageValue] = {}
+        for item in items:
+            if isinstance(item, VariableItem):
+                parsed[item.usage] = item.parse(data)
+            elif isinstance(item, ArrayItem):
+                usage_values = item.parse(data)
+                for usage in usage_values:
+                    if usage in parsed:
+                        warnings.warn(HIDReportWarning(f'Overriding usage: {usage}'))
+                parsed.update(usage_values)
+            elif isinstance(item, PaddingItem):
+                pass
+            else:
+                raise TypeError(f'Unknown item: {item}')
+        return parsed
+
+    def _parse_report(self, item_poll: _ITEM_POOL, data: Sequence[int]) -> Dict[Usage, UsageValue]:
+        if None in item_poll:  # unnumbered reports
+            return self._parse_report_items(item_poll[None], data)
+        else:  # numbered reports
+            return self._parse_report_items(item_poll[data[0]], data[1:])
+
+    def parse_input_report(self, data: Sequence[int]) -> Dict[Usage, UsageValue]:
+        return self._parse_report(self._input, data)
+
+    def parse_output_report(self, data: Sequence[int]) -> Dict[Usage, UsageValue]:
+        return self._parse_report(self._output, data)
+
+    def parse_feature_report(self, data: Sequence[int]) -> Dict[Usage, UsageValue]:
+        return self._parse_report(self._feature, data)
 
     def _iterate_raw(self) -> Iterable[Tuple[int, int, Optional[int]]]:
         i = 0
