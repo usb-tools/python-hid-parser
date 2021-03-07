@@ -21,6 +21,7 @@ class _DataMeta(type):
 
         MY_DATA_VALUE = 0x01
         _single[0x01] = ('Data description', None)
+        MY_DATA_RANGE = range(0x02, 0x06+1)
         _range.append(tuple(0x02, 0x06, ('Data range description', None)))
 
     As you can see, for single data insertions, the variable will be kept with
@@ -88,6 +89,7 @@ class _DataMeta(type):
                         if nmin <= num <= nmax:
                             raise ValueError(f"Duplicated value in '{attr}' ({num})")
 
+                    dic[attr] = range(nmin, nmax+1)
                     dic['_range'].append((nmin, nmax, (desc, sub)))
 
                 else:
