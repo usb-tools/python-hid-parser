@@ -907,6 +907,9 @@ class ReportDescriptor():
                         usages.append(Usage(usage_page, i))
                     usage_min = None
 
+                elif tag in (TagLocal.STRING_INDEX, TagLocal.STRING_MINIMUM, TagLocal.STRING_MAXIMUM):
+                    pass  # we don't care about this information to parse the reports
+
                 else:
                     raise NotImplementedError(f'Unsupported local tag: {bin(tag)}')
 
