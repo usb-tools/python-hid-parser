@@ -700,7 +700,13 @@ class ReportDescriptor():
             else:
                 if i + 1 + size >= len(self.data):
                     raise InvalidReportDescriptor(f'Invalid size: expecting >={i + 1 + size}, got {len(self.data)}')
-                data = struct.unpack('<H', bytes(self.data[i+1:i+1+size]))[0]
+                if size == 2:
+                    pack_type = 'H'
+                elif size == 4:
+                    pack_type = 'L'
+                else:
+                    raise ValueError(f'Invalid item size: {size}')
+                data = struct.unpack(f'<{pack_type}', bytes(self.data[i+1:i+1+size]))[0]
 
             yield typ, tag, data
 
