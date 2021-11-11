@@ -908,7 +908,7 @@ class ReportDescriptor():
                     usage_min = None
 
                 else:
-                    raise NotImplementedError(f'Unsupported global tag: {bin(tag)}')
+                    raise NotImplementedError(f'Unsupported local tag: {bin(tag)}')
 
     @staticmethod
     def _get_main_item_desc(value: int) -> str:
