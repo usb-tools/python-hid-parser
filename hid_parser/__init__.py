@@ -35,6 +35,10 @@ class HIDReportWarning(HIDWarning):
     pass
 
 
+class HIDUnsupportedWarning(HIDWarning):
+    pass
+
+
 class Type():
     MAIN = 0
     GLOBAL = 1
@@ -887,6 +891,11 @@ class ReportDescriptor():
                     for offset_list in (offset_input, offset_output, offset_feature):
                         if report_id not in offset_list:
                             offset_list[report_id] = 0
+
+                elif tag in (TagGlobal.UNIT, TagGlobal.UNIT_EXPONENT):
+                    warnings.warn(HIDUnsupportedWarning(
+                        "Data specifies a unit or unit exponent, but we don't support those yet"
+                    ))
 
                 elif tag == TagGlobal.REPORT_COUNT:
                     report_count = data
