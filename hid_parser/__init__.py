@@ -591,7 +591,7 @@ _ITEM_POOL = Dict[Optional[int], List[BaseItem]]
 
 
 class ReportDescriptor():
-    def __init__(self, data: Sequence[int]) -> None:
+    def __init__(self, data: Sequence[int], parse: bool=True) -> None:
         self._data = data
 
         for byte in data:
@@ -604,7 +604,8 @@ class ReportDescriptor():
         self._output: _ITEM_POOL = {}
         self._feature: _ITEM_POOL = {}
 
-        self._parse()
+        if parse:
+            self._parse()
 
     @property
     def data(self) -> Sequence[int]:
