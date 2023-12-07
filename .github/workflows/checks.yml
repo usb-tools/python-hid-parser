@@ -14,14 +14,16 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        python: [3.7, 3.8, 3.9]
+        python-version: ['3.8', '3.9', '3.10']
 
     steps:
     - name: Checkout
-      uses: actions/checkout@v1
+      uses: actions/checkout@v4
 
     - name: Set up Python
-      uses: actions/setup-python@v1
+      uses: actions/setup-python@v5
+      with:
+        python-version: ${{ matrix.python-version }}
 
     - name: Install mypy
       run: |
@@ -33,19 +35,19 @@ jobs:
       run: pip install typing-extensions
 
     - name: Run mypy
-      run: mypy --python-version ${{ matrix.python }} -p hid_parser
+      run: mypy --python-version ${{ matrix.python-version }} -p hid_parser
 
 
   pre-commit:
     runs-on: ubuntu-latest
     steps:
     - name: Checkout
-      uses: actions/checkout@v2
+      uses: actions/checkout@v4
 
     - name: Setup Python
-      uses: actions/setup-python@v2
+      uses: actions/setup-python@v5
       with:
-        python-version: 3.7
+        python-version: 3.9
 
     - name: Run pre-commit
-      uses: pre-commit/action@v2.0.0
+      uses: pre-commit/action@v3.0.0
