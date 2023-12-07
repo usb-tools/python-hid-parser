@@ -85,37 +85,21 @@ def _data_bit_shift(data: Sequence[int], offset: int, length: int) -> Sequence[i
     if not length > 0:
         raise ValueError(f'Invalid specified length: {length}')
 
-    left_extra = offset % 8
-    right_extra = 8 - (offset + length) % 8
-    start_offset = offset // 8
-    end_offset = (offset + length - 1) // 8
-    byte_length = (length - 1) // 8 + 1
+    byte_offset = offset // 8
+    byte_len = (length + 7) // 8
+    in_end = (length + offset + 7) // 8
 
-    if not end_offset < len(data):
-        raise ValueError(f'Invalid data length: {len(data)} (expecting {end_offset + 1})')
+    if in_end > len(data):
+        raise ValueError(f'Invalid data length: {len(data)} (expecting {in_end})')
 
-    shifted = [0] * byte_length
-
-    if right_extra == 8:
-        right_extra = 0
-
-    i = end_offset
-    shifted_offset = byte_length - 1
-    while shifted_offset >= 0:
-        shifted[shifted_offset] = data[i] >> right_extra
-
-        if i - start_offset >= 0:
-            shifted[shifted_offset] |= (data[i - 1] & (0xff >> (8 - right_extra))) << (8 - right_extra)
-
-        shifted_offset -= 1
-        i -= 1
-
-    shifted[0] &= 0xff >> ((left_extra + right_extra) % 8)
-
-    if not len(shifted) == byte_length:
-        raise ValueError('Invalid data')
-
-    return shifted
+    in_slice = data[byte_offset:in_end]
+    # Take advantage of long ints in Python >= 3
+    val = int.from_bytes(in_slice, byteorder='little')
+    # Shift leading LSBs
+    val >>= offset % 8
+    # Mask trailing MSBs
+    val &= (1 << length) - 1
+    return val.to_bytes(byte_len, byteorder='little')
 
 
 class BitNumber(int):
@@ -333,6 +317,7 @@ class MainItem(BaseItem):
         self._logical_max = logical_max
         self._physical_min = physical_min
         self._physical_max = physical_max
+        self._signed = (logical_min < 0) or (logical_max < 0)
         # TODO: unit
 
     @property
@@ -428,6 +413,10 @@ class VariableItem(MainItem):
             )
         ):  # int
             value = int.from_bytes(data, byteorder='little')
+            # Sign extend
+            if self._signed and (value >> (self.size - 1)) != 0:
+                # Subtracting twice the sign bit saves explicit clearing
+                value -= (1 << self.size)
         elif (
             hid_parser.data.UsageTypes.ON_OFF_CONTROL in self.usage.usage_types
             and not self.preferred_state
