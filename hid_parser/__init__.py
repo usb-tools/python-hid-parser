@@ -66,6 +66,14 @@ class TagGlobal():
     REPORT_COUNT = 0b1001
     PUSH = 0b1010
     POP = 0b1011
+    # These tags have signed integer data
+    _signed_tags = (
+        LOGICAL_MINIMUM,
+        LOGICAL_MAXIMUM,
+        PHYSICAL_MINIMUM,
+        PHYSICAL_MAXIMUM,
+        UNIT_EXPONENT,
+    )
 
 
 class TagLocal():
@@ -79,6 +87,15 @@ class TagLocal():
     STRING_MINIMUM = 0b1000
     STRING_MAXIMUM = 0b1001
     DELIMITER = 0b1010
+
+
+def _item_is_signed(tag: int, typ: int) -> bool:
+    if typ != Type.GLOBAL:
+        return False
+    if tag in TagGlobal._signed_tags:
+        return True
+    else:
+        return False
 
 
 def _data_bit_shift(data: Sequence[int], offset: int, length: int) -> Sequence[int]:
@@ -688,33 +705,36 @@ class ReportDescriptor():
         i = 0
         while i < len(self.data):
             prefix = self.data[i]
+            i += 1
             tag = (prefix & 0b11110000) >> 4
             typ = (prefix & 0b00001100) >> 2
             size = prefix & 0b00000011
 
-            if size == 3:  # 6.2.2.2
-                size = 4
-
             if size == 0:
-                data = None
-            elif size == 1:
-                if i + 1 >= len(self.data):
-                    raise InvalidReportDescriptor(f'Invalid size: expecting >={i + 1}, got {len(self.data)}')
-                data = self.data[i+1]
-            else:
-                if i + 1 + size >= len(self.data):
-                    raise InvalidReportDescriptor(f'Invalid size: expecting >={i + 1 + size}, got {len(self.data)}')
-                if size == 2:
-                    pack_type = 'H'
-                elif size == 4:
-                    pack_type = 'L'
+                # 6.2.2.4 Main items with empty data have a value of zero
+                if typ == Type.MAIN:
+                    data = 0
                 else:
-                    raise ValueError(f'Invalid item size: {size}')
-                data = struct.unpack(f'<{pack_type}', bytes(self.data[i+1:i+1+size]))[0]
+                    data = None
+            elif size > 3:
+                raise ValueError(f'Invalid item size: {size}')
+            else:
+                # Pick an unpack format letter by size and signedness
+                # Per 6.2.2.2, size of 0b11 means 4
+                if _item_is_signed(tag, typ):
+                    pack_type = '0bhl'[size]
+                else:
+                    pack_type = '0BHL'[size]
+                fmt = f'<{pack_type}'
+                size = struct.calcsize(fmt)
+                if i + size > len(self.data):
+                    raise InvalidReportDescriptor(f'Invalid size: expecting >={i + size}, got {len(self.data)}')
+
+                data, = struct.unpack(fmt, bytes(self.data[i:i+size]))
 
             yield typ, tag, data
 
-            i += size + 1
+            i += size
 
     def _append_item(
         self,

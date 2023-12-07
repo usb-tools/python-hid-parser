@@ -224,12 +224,16 @@ def test_simple_mouse_items():
     assert int(items[4].size) == 8
     assert items[4].usage.page == hid_parser.data.UsagePages.GENERIC_DESKTOP_CONTROLS_PAGE
     assert items[4].usage.usage == hid_parser.data.GenericDesktopControls.X
+    assert items[4].logical_min == -127
+    assert items[4].logical_max == 127
 
     assert isinstance(items[5], hid_parser.VariableItem)
     assert int(items[5].offset) == 8*2
     assert int(items[5].size) == 8
     assert items[5].usage.page == hid_parser.data.UsagePages.GENERIC_DESKTOP_CONTROLS_PAGE
     assert items[5].usage.usage == hid_parser.data.GenericDesktopControls.Y
+    assert items[5].logical_min == -127
+    assert items[5].logical_max == 127
 
 
 def test_linux_hidpp_items():
