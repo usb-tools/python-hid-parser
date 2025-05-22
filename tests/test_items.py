@@ -184,15 +184,3 @@ def test_arrayitem_compliance():
 
     with pytest.warns(hid_parser.HIDComplianceWarning):
         hid_parser.ArrayItem(1, 2, 1, 0, usages, -1, 1)
-
-    with warnings.catch_warnings():
-        hid_parser.ArrayItem(1, 2, 1, 0, usages, -1, 1)
-        warnings.simplefilter("error")
-
-    with warnings.catch_warnings():
-        hid_parser.ArrayItem(1, 2, 1, 0, usages, -1, 1)
-        warnings.simplefilter("error")
-
-    with warnings.catch_warnings():
-        hid_parser.ArrayItem(1, 2, 1, 0, usages, -1, 1)
-        warnings.simplefilter("error")
