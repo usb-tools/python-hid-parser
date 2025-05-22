@@ -8,6 +8,8 @@ import pytest
 import hid_parser
 
 
+# fmt: off
+
 simple_mouse_rdesc = [
     0x05, 0x01,  # .Usage Page (Generic Desktop)        0
     0x09, 0x02,  # .Usage (Mouse)                       2
@@ -157,6 +159,8 @@ linux_hidpp_rdesc = [
     0x91, 0x00,        #  Output (Data,Arr,Abs)              231
     0xc0,              # End Collection                      233
 ]
+
+# fmt: on
 
 
 @pytest.mark.parametrize(
