@@ -2,7 +2,7 @@
 
 import enum
 
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any, ClassVar, Optional
 
 
 class _DataMeta(type):
@@ -42,7 +42,7 @@ class _DataMeta(type):
     This metaclass also does some verification to prevent duplicated data.
     """
 
-    def __new__(mcs, name: str, bases: Tuple[Any], dic: Dict[str, Any]):  # type: ignore  # noqa: C901
+    def __new__(mcs, name: str, bases: tuple[Any], dic: dict[str, Any]):  # type: ignore[no-untyped-def]  # noqa: C901
         dic['_single'] = {}
         dic['_range'] = []
 
@@ -61,16 +61,20 @@ class _DataMeta(type):
                     num, desc, sub = data[attr]
 
                     if not isinstance(num, int):
-                        raise TypeError(f"First element of '{attr}' should be an int")
+                        msg = f"First element of '{attr}' should be an int"
+                        raise TypeError(msg)
                     if not isinstance(desc, str):
-                        raise TypeError(f"Second element of '{attr}' should be a string")
+                        msg = f"Second element of '{attr}' should be a string"
+                        raise TypeError(msg)
 
                     if num in dic['_single']:
-                        raise ValueError(f"Duplicated value in '{attr}' ({num})")
+                        msg = f"Duplicated value in '{attr}' ({num})"
+                        raise ValueError(msg)
 
                     for nmin, nmax, _ in dic['_range']:
                         if nmin <= num <= nmax:
-                            raise ValueError(f"Duplicated value in '{attr}' ({num})")
+                            msg = f"Duplicated value in '{attr}' ({num})"
+                            raise ValueError(msg)
 
                     dic[attr] = num
                     dic['_single'][num] = desc, sub
@@ -78,23 +82,29 @@ class _DataMeta(type):
                     nmin, el, nmax, desc, sub = data[attr]
 
                     if not el == Ellipsis:
-                        raise TypeError(f"Second element of '{attr}' should be an ellipsis (...)")
+                        msg = f"Second element of '{attr}' should be an ellipsis (...)"
+                        raise TypeError(msg)
                     if not isinstance(nmin, int):
-                        raise TypeError(f"First element of '{attr}' should be an int")
+                        msg = f"First element of '{attr}' should be an int"
+                        raise TypeError(msg)
                     if not isinstance(nmax, int):
-                        raise TypeError(f"Third element of '{attr}' should be an int")
+                        msg = f"Third element of '{attr}' should be an int"
+                        raise TypeError(msg)
                     if not isinstance(desc, str):
-                        raise TypeError(f"Fourth element of '{attr}' should be a string")
+                        msg = f"Fourth element of '{attr}' should be a string"
+                        raise TypeError(msg)
 
                     for num in dic['_single']:
                         if nmin <= num <= nmax:
-                            raise ValueError(f"Duplicated value in '{attr}' ({num})")
+                            msg = f"Duplicated value in '{attr}' ({num})"
+                            raise ValueError(msg)
 
                     dic[attr] = range(nmin, nmax + 1)
                     dic['_range'].append((nmin, nmax, (desc, sub)))
 
                 else:
-                    raise ValueError(f'Invalid field: {attr}')
+                    msg = f'Invalid field: {attr}'
+                    raise ValueError(msg)
 
         return super().__new__(mcs, name, bases, dic)
 
@@ -105,14 +115,15 @@ class _Data(metaclass=_DataMeta):
     See the _DataMeta documentation for more information.
     """
 
-    _DATA = Tuple[str, Optional[Any]]
-    _single: Dict[int, _DATA]
-    _range: List[Tuple[int, int, _DATA]]
+    _DATA = tuple[str, Optional[Any]]
+    _single: dict[int, _DATA]
+    _range: list[tuple[int, int, _DATA]]
 
     @classmethod
     def _get_data(cls, num: Optional[int]) -> _DATA:
         if num is None:
-            raise KeyError('Data index is not an int')
+            msg = 'Data index is not an int'
+            raise KeyError(msg)
 
         if num in cls._single:
             return cls._single[num]
@@ -121,7 +132,8 @@ class _Data(metaclass=_DataMeta):
             if nmin <= num <= nmax:
                 return data
 
-        raise KeyError(f'Data not found for index 0x{num:02x} in {cls.__name__}')
+        msg = f'Data not found for index 0x{num:02x} in {cls.__name__}'
+        raise KeyError(msg)
 
     @classmethod
     def get_description(cls, num: Optional[int]) -> str:
@@ -132,7 +144,8 @@ class _Data(metaclass=_DataMeta):
         subdata = cls._get_data(num)[1]
 
         if not subdata:
-            raise ValueError('Sub-data not available')
+            msg = 'Sub-data not available'
+            raise ValueError(msg)
 
         return subdata
 
@@ -579,7 +592,7 @@ class Button(_Data):
         UsageTypes.OSC,
     )
 
-    data = {
+    data: ClassVar[dict[str, tuple[int, str, UsageTypes]]] = {
         'NO_BUTTON': (0x0000, 'Button 1 (primary/trigger)', _USAGE_TYPES),
         'BUTTON_1': (0x0001, 'Button 1 (primary/trigger)', _USAGE_TYPES),
         'BUTTON_2': (0x0002, 'Button 2 (secondary)', _USAGE_TYPES),

@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-import functools
 import struct
 import sys
 import textwrap
@@ -10,21 +9,7 @@ import typing
 import warnings
 
 from collections.abc import Iterable, Iterator, Sequence
-from typing import (
-    Any,
-    Dict,
-    List,
-    Optional,
-    TextIO,
-    Tuple,
-    Union,
-)
-
-
-if sys.version_info >= (3, 8):
-    from typing import Literal
-else:  # pragma: no cover
-    from typing_extensions import Literal
+from typing import Any, Literal, Optional, TextIO
 
 import hid_parser.data
 
@@ -109,7 +94,8 @@ def _item_is_signed(tag: int, typ: int) -> bool:
 
 def _data_bit_shift(data: Sequence[int], offset: int, length: int) -> Sequence[int]:
     if not length > 0:
-        raise ValueError(f'Invalid specified length: {length}')
+        msg = f'Invalid specified length: {length}'
+        raise ValueError(msg)
 
     left_extra = offset % 8
     right_extra = 8 - (offset + length) % 8
@@ -118,7 +104,8 @@ def _data_bit_shift(data: Sequence[int], offset: int, length: int) -> Sequence[i
     byte_length = (length - 1) // 8 + 1
 
     if not end_offset < len(data):
-        raise ValueError(f'Invalid data length: {len(data)} (expecting {end_offset + 1})')
+        msg = f'Invalid data length: {len(data)} (expecting {end_offset + 1})'
+        raise ValueError(msg)
 
     shifted = [0] * byte_length
 
@@ -139,7 +126,8 @@ def _data_bit_shift(data: Sequence[int], offset: int, length: int) -> Sequence[i
     shifted[0] &= 0xFF >> ((left_extra + right_extra) % 8)
 
     if not len(shifted) == byte_length:
-        raise ValueError('Invalid data')
+        msg = 'Invalid data'
+        raise ValueError(msg)
 
     return shifted
 
@@ -201,13 +189,14 @@ class BitNumber(int):
 class Usage:
     def __init__(
         self,
-        page: Optional[int] = None,
-        usage: Optional[int] = None,
+        page: int | None = None,
+        usage: int | None = None,
         *,
-        extended_usage: Optional[int] = None,
+        extended_usage: int | None = None,
     ) -> None:
         if extended_usage and page and usage:
-            raise ValueError('You need to specify either the usage page and usage or the extended usage')
+            msg = 'You need to specify either the usage page and usage or the extended usage'
+            raise ValueError(msg)
         if extended_usage is not None:
             self.page = extended_usage >> (2 * 8)
             self.usage = extended_usage & 0xFFFF
@@ -215,7 +204,8 @@ class Usage:
             self.page = page
             self.usage = usage
         else:
-            raise ValueError('No usage specified')
+            msg = 'No usage specified'
+            raise ValueError(msg)
 
     def __int__(self) -> int:
         return self.page << (2 * 8) | self.usage
@@ -243,7 +233,7 @@ class Usage:
         return f'Usage(page={page_str}, usage={usage_str})'
 
     @property
-    def usage_types(self) -> Tuple[hid_parser.data.UsageTypes]:
+    def usage_types(self) -> tuple[hid_parser.data.UsageTypes]:
         subdata = hid_parser.data.UsagePages.get_subdata(self.page).get_subdata(self.usage)
 
         if isinstance(subdata, tuple):
@@ -253,9 +243,10 @@ class Usage:
 
         for typ in types:
             if not isinstance(typ, hid_parser.data.UsageTypes):
-                raise ValueError(f"Expecting usage type but got '{type(typ)}'")
+                msg = f"Expecting usage type but got '{type(typ)}'"
+                raise TypeError(msg)
 
-        return typing.cast(Tuple[hid_parser.data.UsageTypes], types)
+        return typing.cast(tuple[hid_parser.data.UsageTypes], types)
 
 
 class UsageValue:
@@ -270,7 +261,7 @@ class UsageValue:
         return repr(self.value)
 
     @property
-    def value(self) -> Union[int, bool]:
+    def value(self) -> int | bool:
         return self._value
 
     @property
@@ -295,8 +286,8 @@ class VendorUsageValue(UsageValue):
         self,
         item: MainItem,
         *,
-        value: Optional[int] = None,
-        value_list: Optional[List[int]] = None,
+        value: int | None = None,
+        value_list: list[int] | None = None,
     ):
         self._item = item
         if value:
@@ -313,11 +304,11 @@ class VendorUsageValue(UsageValue):
         return iter(self.list)
 
     @property
-    def value(self) -> Union[int, bool]:
+    def value(self) -> int | bool:
         return int.from_bytes(self._list, byteorder='little')
 
     @property
-    def list(self) -> List[int]:
+    def list(self) -> list[int]:
         return self._list
 
 
@@ -350,8 +341,8 @@ class MainItem(BaseItem):
         flags: int,
         logical_min: int,
         logical_max: int,
-        physical_min: Optional[int] = None,
-        physical_max: Optional[int] = None,
+        physical_min: int | None = None,
+        physical_max: int | None = None,
     ):
         super().__init__(offset, size)
         self._flags = flags
@@ -378,11 +369,11 @@ class MainItem(BaseItem):
         return self._logical_max
 
     @property
-    def physical_min(self) -> Optional[int]:
+    def physical_min(self) -> int | None:
         return self._physical_min
 
     @property
-    def physical_max(self) -> Optional[int]:
+    def physical_max(self) -> int | None:
         return self._physical_max
 
     # flags
@@ -425,15 +416,17 @@ class VariableItem(MainItem):
         usage: Usage,
         logical_min: int,
         logical_max: int,
-        physical_min: Optional[int] = None,
-        physical_max: Optional[int] = None,
+        physical_min: int | None = None,
+        physical_max: int | None = None,
     ):
         super().__init__(offset, size, flags, logical_min, logical_max, physical_min, physical_max)
         self._usage = usage
 
         try:
             if all(usage_type in self._INCOMPATIBLE_TYPES for usage_type in usage.usage_types):
-                warnings.warn(HIDComplianceWarning(f'{usage} has no compatible usage types with a variable item'))
+                warnings.warn(
+                    HIDComplianceWarning(f'{usage} has no compatible usage types with a variable item'), stacklevel=2
+                )
         except (KeyError, ValueError):
             pass
 
@@ -524,11 +517,11 @@ class ArrayItem(MainItem):
         size: int,
         count: int,
         flags: int,
-        usages: List[Usage],
+        usages: list[Usage],
         logical_min: int,
         logical_max: int,
-        physical_min: Optional[int] = None,
-        physical_max: Optional[int] = None,
+        physical_min: int | None = None,
+        physical_max: int | None = None,
     ):
         super().__init__(offset, size, flags, logical_min, logical_max, physical_min, physical_max)
         self._count = count
@@ -537,14 +530,17 @@ class ArrayItem(MainItem):
 
         for usage in self._usages:
             if usage.page != self._page:
-                raise ValueError(f'Mismatching usage page in usage: {usage} (expecting {self._usages[0]})')
+                msg = f'Mismatching usage page in usage: {usage} (expecting {self._usages[0]})'
+                raise ValueError(msg)
             try:
                 if all(usage_type in self._INCOMPATIBLE_TYPES for usage_type in usage.usage_types):
-                    warnings.warn(HIDComplianceWarning(f'{usage} has no compatible usage types with an array item'))
+                    warnings.warn(
+                        HIDComplianceWarning(f'{usage} has no compatible usage types with an array item'), stacklevel=2
+                    )
             except (KeyError, ValueError):
                 pass
 
-        self._ignore_usages: List[Usage] = []
+        self._ignore_usages: list[Usage] = []
         for page, usage_id in self._IGNORE_USAGE_VALUES:
             assert isinstance(page, int) and isinstance(usage_id, int)
             self._ignore_usages.append(Usage(page, usage_id))
@@ -568,8 +564,8 @@ class ArrayItem(MainItem):
             )
         )
 
-    def parse(self, data: Sequence[int]) -> Dict[Usage, UsageValue]:
-        usage_values: Dict[Usage, UsageValue] = {}
+    def parse(self, data: Sequence[int]) -> dict[Usage, UsageValue]:
+        usage_values: dict[Usage, UsageValue] = {}
 
         for i in range(self.count):
             aligned_data = _data_bit_shift(data, self.offset + i * 8, self.size)
@@ -602,7 +598,7 @@ class ArrayItem(MainItem):
         return self._count
 
     @property
-    def usages(self) -> List[Usage]:
+    def usages(self) -> list[Usage]:
         return self._usages
 
 
@@ -611,7 +607,7 @@ class InvalidReportDescriptor(Exception):
 
 
 # report ID (None for no report ID), item list
-_ITEM_POOL = Dict[Optional[int], List[BaseItem]]
+_ITEM_POOL = dict[Optional[int], list[BaseItem]]
 
 
 class ReportDescriptor:
@@ -620,9 +616,8 @@ class ReportDescriptor:
 
         for byte in data:
             if byte < 0 or byte > 255:
-                raise InvalidReportDescriptor(
-                    f'A report descriptor should be represented by a list of bytes: found value {byte}'
-                )
+                msg = f'A report descriptor should be represented by a list of bytes: found value {byte}'
+                raise InvalidReportDescriptor(msg)
 
         self._input: _ITEM_POOL = {}
         self._output: _ITEM_POOL = {}
@@ -635,18 +630,18 @@ class ReportDescriptor:
         return self._data
 
     @property
-    def input_report_ids(self) -> List[Optional[int]]:
+    def input_report_ids(self) -> list[int | None]:
         return list(self._input.keys())
 
     @property
-    def output_report_ids(self) -> List[Optional[int]]:
+    def output_report_ids(self) -> list[int | None]:
         return list(self._output.keys())
 
     @property
-    def feature_report_ids(self) -> List[Optional[int]]:
+    def feature_report_ids(self) -> list[int | None]:
         return list(self._feature.keys())
 
-    def _get_report_size(self, items: List[BaseItem]) -> BitNumber:
+    def _get_report_size(self, items: list[BaseItem]) -> BitNumber:
         size = 0
         for item in items:
             if isinstance(item, ArrayItem):
@@ -655,29 +650,26 @@ class ReportDescriptor:
                 size += item.size
         return BitNumber(size)
 
-    def get_input_items(self, report_id: Optional[int] = None) -> List[BaseItem]:
+    def get_input_items(self, report_id: int | None = None) -> list[BaseItem]:
         return self._input[report_id]
 
-    @functools.lru_cache(maxsize=16)
-    def get_input_report_size(self, report_id: Optional[int] = None) -> BitNumber:
+    def get_input_report_size(self, report_id: int | None = None) -> BitNumber:
         return self._get_report_size(self.get_input_items(report_id))
 
-    def get_output_items(self, report_id: Optional[int] = None) -> List[BaseItem]:
+    def get_output_items(self, report_id: int | None = None) -> list[BaseItem]:
         return self._output[report_id]
 
-    @functools.lru_cache(maxsize=16)
-    def get_output_report_size(self, report_id: Optional[int] = None) -> BitNumber:
+    def get_output_report_size(self, report_id: int | None = None) -> BitNumber:
         return self._get_report_size(self.get_output_items(report_id))
 
-    def get_feature_items(self, report_id: Optional[int] = None) -> List[BaseItem]:
+    def get_feature_items(self, report_id: int | None = None) -> list[BaseItem]:
         return self._feature[report_id]
 
-    @functools.lru_cache(maxsize=16)
-    def get_feature_report_size(self, report_id: Optional[int] = None) -> BitNumber:
+    def get_feature_report_size(self, report_id: int | None = None) -> BitNumber:
         return self._get_report_size(self.get_feature_items(report_id))
 
-    def _parse_report_items(self, items: List[BaseItem], data: Sequence[int]) -> Dict[Usage, UsageValue]:
-        parsed: Dict[Usage, UsageValue] = {}
+    def _parse_report_items(self, items: list[BaseItem], data: Sequence[int]) -> dict[Usage, UsageValue]:
+        parsed: dict[Usage, UsageValue] = {}
         for item in items:
             if isinstance(item, VariableItem):
                 parsed[item.usage] = item.parse(data)
@@ -685,30 +677,31 @@ class ReportDescriptor:
                 usage_values = item.parse(data)
                 for usage in usage_values:
                     if usage in parsed:
-                        warnings.warn(HIDReportWarning(f'Overriding usage: {usage}'))
+                        warnings.warn(HIDReportWarning(f'Overriding usage: {usage}'), stacklevel=2)
                 parsed.update(usage_values)
             elif isinstance(item, PaddingItem):
                 pass
             else:
-                raise TypeError(f'Unknown item: {item}')
+                msg = f'Unknown item: {item}'
+                raise TypeError(msg)
         return parsed
 
-    def _parse_report(self, item_poll: _ITEM_POOL, data: Sequence[int]) -> Dict[Usage, UsageValue]:
+    def _parse_report(self, item_poll: _ITEM_POOL, data: Sequence[int]) -> dict[Usage, UsageValue]:
         if None in item_poll:  # unnumbered reports
             return self._parse_report_items(item_poll[None], data)
         else:  # numbered reports
             return self._parse_report_items(item_poll[data[0]], data[1:])
 
-    def parse_input_report(self, data: Sequence[int]) -> Dict[Usage, UsageValue]:
+    def parse_input_report(self, data: Sequence[int]) -> dict[Usage, UsageValue]:
         return self._parse_report(self._input, data)
 
-    def parse_output_report(self, data: Sequence[int]) -> Dict[Usage, UsageValue]:
+    def parse_output_report(self, data: Sequence[int]) -> dict[Usage, UsageValue]:
         return self._parse_report(self._output, data)
 
-    def parse_feature_report(self, data: Sequence[int]) -> Dict[Usage, UsageValue]:
+    def parse_feature_report(self, data: Sequence[int]) -> dict[Usage, UsageValue]:
         return self._parse_report(self._feature, data)
 
-    def _iterate_raw(self) -> Iterable[Tuple[int, int, Optional[int]]]:
+    def _iterate_raw(self) -> Iterable[tuple[int, int, int | None]]:
         i = 0
         while i < len(self.data):
             prefix = self.data[i]
@@ -724,7 +717,8 @@ class ReportDescriptor:
                 else:
                     data = None
             elif size > 3:
-                raise ValueError(f'Invalid item size: {size}')
+                msg = f'Invalid item size: {size}'
+                raise ValueError(msg)
             else:
                 # Pick an unpack format letter by size and signedness
                 # Per 6.2.2.2, size of 0b11 means 4
@@ -735,7 +729,8 @@ class ReportDescriptor:
                 fmt = f'<{pack_type}'
                 size = struct.calcsize(fmt)
                 if i + size > len(self.data):
-                    raise InvalidReportDescriptor(f'Invalid size: expecting >={i + size}, got {len(self.data)}')
+                    msg = f'Invalid size: expecting >={i + size}, got {len(self.data)}'
+                    raise InvalidReportDescriptor(msg)
 
                 (data,) = struct.unpack(fmt, bytes(self.data[i : i + size]))
 
@@ -745,9 +740,9 @@ class ReportDescriptor:
 
     def _append_item(
         self,
-        offset_list: Dict[Optional[int], int],
+        offset_list: dict[int | None, int],
         pool: _ITEM_POOL,
-        report_id: Optional[int],
+        report_id: int | None,
         item: BaseItem,
     ) -> None:
         offset_list[report_id] += item.size
@@ -758,14 +753,14 @@ class ReportDescriptor:
 
     def _append_items(
         self,
-        offset_list: Dict[Optional[int], int],
+        offset_list: dict[int | None, int],
         pool: _ITEM_POOL,
-        report_id: Optional[int],
+        report_id: int | None,
         report_count: int,
         report_size: int,
-        usages: List[Usage],
+        usages: list[Usage],
         flags: int,
-        data: Dict[str, Any],
+        data: dict[str, Any],
     ) -> None:
         item: BaseItem
         is_array = flags & (1 << 1) == 0  # otherwise variable
@@ -795,7 +790,7 @@ class ReportDescriptor:
         else:
             if len(usages) != report_count:
                 error_str = f'Expecting {report_count} usages but got {len(usages)}'
-                warnings.warn(HIDComplianceWarning(error_str))
+                warnings.warn(HIDComplianceWarning(error_str), stacklevel=2)
                 if len(usages) > report_count:
                     report_count = len(usages)
                 else:
@@ -812,23 +807,23 @@ class ReportDescriptor:
                 self._append_item(offset_list, pool, report_id, item)
 
     def _parse(self, level: int = 0, file: TextIO = sys.stdout) -> None:  # noqa: C901
-        offset_input: Dict[Optional[int], int] = {
+        offset_input: dict[int | None, int] = {
             None: 0,
         }
-        offset_output: Dict[Optional[int], int] = {
+        offset_output: dict[int | None, int] = {
             None: 0,
         }
-        offset_feature: Dict[Optional[int], int] = {
+        offset_feature: dict[int | None, int] = {
             None: 0,
         }
-        report_id: Optional[int] = None
-        report_count: Optional[int] = None
-        report_size: Optional[int] = None
-        usage_page: Optional[int] = None
-        usages: List[Usage] = []
-        usage_min: Optional[int] = None
-        glob: Dict[str, Any] = {}
-        local: Dict[str, Any] = {}
+        report_id: int | None = None
+        report_count: int | None = None
+        report_size: int | None = None
+        usage_page: int | None = None
+        usages: list[Usage] = []
+        usage_min: int | None = None
+        glob: dict[str, Any] = {}
+        local: dict[str, Any] = {}
 
         for typ, tag, data in self._iterate_raw():
             if typ == Type.MAIN:
@@ -840,13 +835,16 @@ class ReportDescriptor:
                     continue
 
                 if report_count is None:
-                    raise InvalidReportDescriptor('Trying to append an item but no report count given')
+                    msg = 'Trying to append an item but no report count given'
+                    raise InvalidReportDescriptor(msg)
                 if report_size is None:
-                    raise InvalidReportDescriptor('Trying to append an item but no report size given')
+                    msg = 'Trying to append an item but no report size given'
+                    raise InvalidReportDescriptor(msg)
 
                 if tag == TagMain.INPUT:
                     if data is None:
-                        raise InvalidReportDescriptor('Invalid input item')
+                        msg = 'Invalid input item'
+                        raise InvalidReportDescriptor(msg)
                     self._append_items(
                         offset_input,
                         self._input,
@@ -860,7 +858,8 @@ class ReportDescriptor:
 
                 elif tag == TagMain.OUTPUT:
                     if data is None:
-                        raise InvalidReportDescriptor('Invalid output item')
+                        msg = 'Invalid output item'
+                        raise InvalidReportDescriptor(msg)
                     self._append_items(
                         offset_output,
                         self._output,
@@ -874,7 +873,8 @@ class ReportDescriptor:
 
                 elif tag == TagMain.FEATURE:
                     if data is None:
-                        raise InvalidReportDescriptor('Invalid feature item')
+                        msg = 'Invalid feature item'
+                        raise InvalidReportDescriptor(msg)
                     self._append_items(
                         offset_feature,
                         self._feature,
@@ -914,7 +914,8 @@ class ReportDescriptor:
 
                 elif tag == TagGlobal.REPORT_ID:
                     if not report_id and (self._input or self._output or self._feature):
-                        raise InvalidReportDescriptor('Tried to set a report ID in a report that does not use them')
+                        msg = 'Tried to set a report ID in a report that does not use them'
+                        raise InvalidReportDescriptor(msg)
                     report_id = data
                     # initialize the item offset for this report ID
                     for offset_list in (offset_input, offset_output, offset_feature):
@@ -923,19 +924,22 @@ class ReportDescriptor:
 
                 elif tag in (TagGlobal.UNIT, TagGlobal.UNIT_EXPONENT):
                     warnings.warn(
-                        HIDUnsupportedWarning("Data specifies a unit or unit exponent, but we don't support those yet")
+                        HIDUnsupportedWarning("Data specifies a unit or unit exponent, but we don't support those yet"),
+                        stacklevel=2,
                     )
 
                 elif tag == TagGlobal.REPORT_COUNT:
                     report_count = data
 
                 else:
-                    raise NotImplementedError(f'Unsupported global tag: {bin(tag)}')
+                    msg = f'Unsupported global tag: {bin(tag)}'
+                    raise NotImplementedError(msg)
 
             elif typ == Type.LOCAL:
                 if tag == TagLocal.USAGE:
                     if usage_page is None:
-                        raise InvalidReportDescriptor('Usage field found but no usage page')
+                        msg = 'Usage field found but no usage page'
+                        raise InvalidReportDescriptor(msg)
                     usages.append(Usage(usage_page, data))
 
                 elif tag == TagLocal.USAGE_MINIMUM:
@@ -943,9 +947,11 @@ class ReportDescriptor:
 
                 elif tag == TagLocal.USAGE_MAXIMUM:
                     if usage_min is None:
-                        raise InvalidReportDescriptor('Usage maximum set but no usage minimum')
+                        msg = 'Usage maximum set but no usage minimum'
+                        raise InvalidReportDescriptor(msg)
                     if data is None:
-                        raise InvalidReportDescriptor('Invalid usage maximum value')
+                        msg = 'Invalid usage maximum value'
+                        raise InvalidReportDescriptor(msg)
                     for i in range(usage_min, data + 1):
                         usages.append(Usage(usage_page, i))
                     usage_min = None
@@ -958,7 +964,8 @@ class ReportDescriptor:
                     pass  # we don't care about this information to parse the reports
 
                 else:
-                    raise NotImplementedError(f'Unsupported local tag: {bin(tag)}')
+                    msg = f'Unsupported local tag: {bin(tag)}'
+                    raise NotImplementedError(msg)
 
     @staticmethod
     def _get_main_item_desc(value: int) -> str:
@@ -982,23 +989,26 @@ class ReportDescriptor:
         def printl(string: str) -> None:
             print(' ' * level + string, file=file)
 
-        usage_data: Union[Literal[False], Optional[hid_parser.data._Data]] = False
+        usage_data: Literal[False] | hid_parser.data._Data | None = False
 
         for typ, tag, data in self._iterate_raw():
             if typ == Type.MAIN:
                 if tag == TagMain.INPUT:
                     if data is None:
-                        raise InvalidReportDescriptor('Invalid input item')
+                        msg = 'Invalid input item'
+                        raise InvalidReportDescriptor(msg)
                     printl(f'Input ({self._get_main_item_desc(data)})')
 
                 elif tag == TagMain.OUTPUT:
                     if data is None:
-                        raise InvalidReportDescriptor('Invalid output item')
+                        msg = 'Invalid output item'
+                        raise InvalidReportDescriptor(msg)
                     printl(f'Output ({self._get_main_item_desc(data)})')
 
                 elif tag == TagMain.FEATURE:
                     if data is None:
-                        raise InvalidReportDescriptor('Invalid feature item')
+                        msg = 'Invalid feature item'
+                        raise InvalidReportDescriptor(msg)
                     printl(f'Feature ({self._get_main_item_desc(data)})')
 
                 elif tag == TagMain.COLLECTION:
@@ -1056,7 +1066,8 @@ class ReportDescriptor:
             elif typ == Type.LOCAL:
                 if tag == TagLocal.USAGE:
                     if usage_data is False:
-                        raise InvalidReportDescriptor('Usage field found but no usage page')
+                        msg = 'Usage field found but no usage page'
+                        raise InvalidReportDescriptor(msg)
 
                     if usage_data:
                         try:

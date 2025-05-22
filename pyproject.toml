@@ -23,6 +23,9 @@ extend-select = [
   'EM',   # flake8-errmsg
 ]
 
+[tool.ruff.lint.extend-per-file-ignores]
+'tests/**.py' = ['RUF012']
+
 [tool.ruff.lint.mccabe]
 max-complexity = 10
 
