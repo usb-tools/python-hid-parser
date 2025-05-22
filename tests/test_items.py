@@ -132,13 +132,11 @@ def test_variableitem_compliance():
     with pytest.warns(hid_parser.HIDComplianceWarning):
         hid_parser.VariableItem(1, 2, 0, hid_parser.Usage(0x0001, 0x0001), -1, 1)
 
-    with warnings.catch_warnings(action='error'):
+    # Python >= 3.11: with warnings.catch_warnings(action='error'):
+    with warnings.catch_warnings():
+        warnings.simplefilter('error')
         hid_parser.VariableItem(1, 2, 0, hid_parser.Usage(0x0001, 0x0030), -1, 1)
-
-    with warnings.catch_warnings(action='error'):
         hid_parser.VariableItem(1, 2, 0, hid_parser.Usage(0x0001, 0x0000), -1, 1)
-
-    with warnings.catch_warnings(action='error'):
         hid_parser.VariableItem(1, 2, 0, hid_parser.Usage(0x0000, 0x0000), -1, 1)
 
 
