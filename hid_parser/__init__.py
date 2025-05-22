@@ -788,11 +788,11 @@ class ReportDescriptor():
         else:
             if len(usages) != report_count:
                 error_str = f'Expecting {report_count} usages but got {len(usages)}'
-                if len(usages) == 1:
-                    warnings.warn(HIDComplianceWarning(error_str))
-                    usages *= report_count
+                warnings.warn(HIDComplianceWarning(error_str))
+                if len(usages) > report_count:
+                    report_count = len(usages)
                 else:
-                    raise InvalidReportDescriptor(error_str)
+                    usages += [] * report_count - len(usages)
 
             for usage in usages:
                 item = VariableItem(
