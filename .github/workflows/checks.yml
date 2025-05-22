@@ -34,18 +34,3 @@ jobs:
 
     - name: Run mypy
       run: mypy --python-version ${{ matrix.python }} -p hid_parser
-
-
-  pre-commit:
-    runs-on: ubuntu-latest
-    steps:
-    - name: Checkout
-      uses: actions/checkout@v2
-
-    - name: Setup Python
-      uses: actions/setup-python@v2
-      with:
-        python-version: 3.7
-
-    - name: Run pre-commit
-      uses: pre-commit/action@v2.0.0
