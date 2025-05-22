@@ -64,3 +64,6 @@ max-complexity = 10
 [tool.ruff.lint.isort]
 lines-between-types = 1
 lines-after-imports = 2
+
+[tool.coverage.html]
+show_contexts = true
