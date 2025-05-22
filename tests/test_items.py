@@ -5,7 +5,7 @@ import sys
 import pytest
 
 import hid_parser
-
+import warnings
 
 def test_baseitem():
     item = hid_parser.BaseItem(1, 2)
@@ -129,14 +129,18 @@ def test_variableitem_compliance():
     with pytest.warns(hid_parser.HIDComplianceWarning):
         hid_parser.VariableItem(1, 2, 0, hid_parser.Usage(0x0001, 0x0001), -1, 1)
 
-    with pytest.warns(None):
+    with warnings.catch_warnings():
         hid_parser.VariableItem(1, 2, 0, hid_parser.Usage(0x0001, 0x0030), -1, 1)
+        warnings.simplefilter("error")
 
-    with pytest.warns(None):
+    with warnings.catch_warnings():
         hid_parser.VariableItem(1, 2, 0, hid_parser.Usage(0x0001, 0x0000), -1, 1)
+        warnings.simplefilter("error")
 
-    with pytest.warns(None):
+    with warnings.catch_warnings():
         hid_parser.VariableItem(1, 2, 0, hid_parser.Usage(0x0000, 0x0000), -1, 1)
+        warnings.simplefilter("error")
+
 
 
 def test_arrayitem():
@@ -178,11 +182,14 @@ def test_arrayitem_compliance():
     with pytest.warns(hid_parser.HIDComplianceWarning):
         hid_parser.ArrayItem(1, 2, 1, 0, usages, -1, 1)
 
-    with pytest.warns(None):
+    with warnings.catch_warnings():
         hid_parser.ArrayItem(1, 2, 1, 0, usages, -1, 1)
+        warnings.simplefilter("error")
 
-    with pytest.warns(None):
+    with warnings.catch_warnings():
         hid_parser.ArrayItem(1, 2, 1, 0, usages, -1, 1)
+        warnings.simplefilter("error")
 
-    with pytest.warns(None):
+    with warnings.catch_warnings():
         hid_parser.ArrayItem(1, 2, 1, 0, usages, -1, 1)
+        warnings.simplefilter("error")
