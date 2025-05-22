@@ -6,7 +6,7 @@ from typing import Any, Dict, List, Optional, Tuple
 
 
 class _DataMeta(type):
-    '''
+    """
     This metaclass populates _single and _range, following the structure described bellow
 
     The class should declare data as follows
@@ -40,7 +40,8 @@ class _DataMeta(type):
         _range.append(tuple(0x02, 0x06, ('Data range description', YET_OTHER_DATA_TYPE)))
 
     This metaclass also does some verification to prevent duplicated data.
-    '''
+    """
+
     def __new__(mcs, name: str, bases: Tuple[Any], dic: Dict[str, Any]):  # type: ignore  # noqa: C901
         dic['_single'] = {}
         dic['_range'] = []
@@ -89,7 +90,7 @@ class _DataMeta(type):
                         if nmin <= num <= nmax:
                             raise ValueError(f"Duplicated value in '{attr}' ({num})")
 
-                    dic[attr] = range(nmin, nmax+1)
+                    dic[attr] = range(nmin, nmax + 1)
                     dic['_range'].append((nmin, nmax, (desc, sub)))
 
                 else:
@@ -99,10 +100,11 @@ class _DataMeta(type):
 
 
 class _Data(metaclass=_DataMeta):
-    '''
+    """
     This class provides a get_description method to get data out of _single and _range.
     See the _DataMeta documentation for more information.
-    '''
+    """
+
     _DATA = Tuple[str, Optional[Any]]
     _single: Dict[int, _DATA]
     _range: List[Tuple[int, int, _DATA]]
@@ -192,7 +194,7 @@ class Collections(_Data):
     NAMED_ARRAY = 0x04, 'Named Array'
     USAGE_SWITCH = 0x05, 'Usage Switch'
     USAGE_MODIFIER = 0x06, 'Usage Modifier'
-    VENDOR = 0x80, ..., 0xff, 'Vendor'
+    VENDOR = 0x80, ..., 0xFF, 'Vendor'
 
 
 class GenericDesktopControls(_Data):
@@ -584,7 +586,7 @@ class Button(_Data):
         'BUTTON_3': (0x0003, 'Button 3 (tertiary)', _USAGE_TYPES),
     }
 
-    for _i in range(0x0004, 0xffff):
+    for _i in range(0x0004, 0xFFFF):
         data[f'BUTTON_{_i}'] = _i, f'Button {_i}', _USAGE_TYPES
 
 
@@ -971,12 +973,12 @@ class PowerDevice(_Data):
     POWER_CONVERTER_ID = 0x17, 'PowerConverterID', UsageTypes.SV
     OUTLET_SYSTEM = 0x18, 'OutletSystem', UsageTypes.CP
     OUTLET_SYSTEM_ID = 0x19, 'OutletSystemID', UsageTypes.SV
-    INPUT = 0x1a, 'Input', UsageTypes.CP
-    INPUT_ID = 0x1b, 'InputID', UsageTypes.SV
-    OUTPUT = 0x1c, 'Output', UsageTypes.CP
-    OUTPUT_ID = 0x1d, 'OutputID', UsageTypes.SV
-    FLOW = 0x1e, 'Flow', UsageTypes.CP
-    FLOW_ID = 0x1f, 'FlowID', UsageTypes.SV
+    INPUT = 0x1A, 'Input', UsageTypes.CP
+    INPUT_ID = 0x1B, 'InputID', UsageTypes.SV
+    OUTPUT = 0x1C, 'Output', UsageTypes.CP
+    OUTPUT_ID = 0x1D, 'OutputID', UsageTypes.SV
+    FLOW = 0x1E, 'Flow', UsageTypes.CP
+    FLOW_ID = 0x1F, 'FlowID', UsageTypes.SV
     OUTLET = 0x20, 'Outlet', UsageTypes.CP
     OUTLET_ID = 0x21, 'OutletID', UsageTypes.SV
     GANG = 0x22, 'Gang', UsageTypes.CP
@@ -1010,7 +1012,7 @@ class PowerDevice(_Data):
     DELAY_BEFORE_SHUTDOWN = 0x57, 'DelayBeforeShutdown', UsageTypes.DV
     TEST = 0x58, 'Test', UsageTypes.DV
     MODULE_RESET = 0x59, 'ModuleReset', UsageTypes.DV
-    AUDIBLE_ALARM_CONTROL = 0x5a, 'AudibleAlarmControl', UsageTypes.DV
+    AUDIBLE_ALARM_CONTROL = 0x5A, 'AudibleAlarmControl', UsageTypes.DV
     PRESENT = 0x60, 'Present', UsageTypes.DF
     GOOD = 0x61, 'Good', UsageTypes.DF
     INTERNAL_FAILURE = 0x62, 'InternalFailure', UsageTypes.DF
@@ -1021,18 +1023,18 @@ class PowerDevice(_Data):
     OVER_TEMPERATURE = 0x67, 'OverTemperature', UsageTypes.DF
     SHUTDOWN_REQUESTED = 0x68, 'ShutdownRequested', UsageTypes.DF
     SHUTDOWN_IMMINEBT = 0x69, 'ShutdownImminent', UsageTypes.DF
-    SWITCH_ON_OFF = 0x6b, 'SwitchOn/Off', UsageTypes.DF
-    SWITCHABLE = 0x6c, 'Switchable', UsageTypes.DF
-    USED = 0x6d, 'Used', UsageTypes.DF
-    BOOST = 0x6e, 'Boost', UsageTypes.DF
-    BUCK = 0x6f, 'Buck', UsageTypes.DF
+    SWITCH_ON_OFF = 0x6B, 'SwitchOn/Off', UsageTypes.DF
+    SWITCHABLE = 0x6C, 'Switchable', UsageTypes.DF
+    USED = 0x6D, 'Used', UsageTypes.DF
+    BOOST = 0x6E, 'Boost', UsageTypes.DF
+    BUCK = 0x6F, 'Buck', UsageTypes.DF
     INITIALIZED = 0x70, 'Initialized', UsageTypes.DF
     TESTED = 0x71, 'Tested', UsageTypes.DF
     AWAITING_POWER = 0x72, 'AwaitingPower', UsageTypes.DF
     COMMUNICATION_LOST = 0x73, 'CommunicationLost', UsageTypes.DF
-    IMANUFACTURER = 0xfd, 'iManufacturer', UsageTypes.SV
-    IPRODUCT = 0xfe, 'iProduct', UsageTypes.SV
-    ISERIALNUMBER = 0xff, 'iSerialNumber', UsageTypes.SV
+    IMANUFACTURER = 0xFD, 'iManufacturer', UsageTypes.SV
+    IPRODUCT = 0xFE, 'iProduct', UsageTypes.SV
+    ISERIALNUMBER = 0xFF, 'iSerialNumber', UsageTypes.SV
 
 
 class FIDO(_Data):

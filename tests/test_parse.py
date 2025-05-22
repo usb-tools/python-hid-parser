@@ -172,13 +172,13 @@ def test_parse(rdesc):
 @pytest.mark.parametrize(
     ('rdesc', 'report_id', 'expected'),
     [
-        (simple_mouse_rdesc, None, 8*3),
-        (linux_hidpp_rdesc, 0x01, 8*7),
-        (linux_hidpp_rdesc, 0x02, 8*8),
-        (linux_hidpp_rdesc, 0x10, 8*6),
-        (linux_hidpp_rdesc, 0x11, 8*19),
-        (linux_hidpp_rdesc, 0x20, 8*14),
-        (linux_hidpp_rdesc, 0x21, 8*31),
+        (simple_mouse_rdesc, None, 8 * 3),
+        (linux_hidpp_rdesc, 0x01, 8 * 7),
+        (linux_hidpp_rdesc, 0x02, 8 * 8),
+        (linux_hidpp_rdesc, 0x10, 8 * 6),
+        (linux_hidpp_rdesc, 0x11, 8 * 19),
+        (linux_hidpp_rdesc, 0x20, 8 * 14),
+        (linux_hidpp_rdesc, 0x21, 8 * 31),
     ],
 )
 def test_size(rdesc, report_id, expected):
@@ -228,7 +228,7 @@ def test_simple_mouse_items():
     assert items[4].logical_max == 127
 
     assert isinstance(items[5], hid_parser.VariableItem)
-    assert int(items[5].offset) == 8*2
+    assert int(items[5].offset) == 8 * 2
     assert int(items[5].size) == 8
     assert items[5].usage.page == hid_parser.data.UsagePages.GENERIC_DESKTOP_CONTROLS_PAGE
     assert items[5].usage.usage == hid_parser.data.GenericDesktopControls.Y
@@ -248,7 +248,7 @@ def test_linux_hidpp_items():
         0x21,
     ]
     assert rdesc.output_report_ids == [
-        0x0e,
+        0x0E,
         0x10,
         0x11,
         0x20,

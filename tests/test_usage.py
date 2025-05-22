@@ -20,7 +20,7 @@ def test_create():
 def test_create_error():
     with pytest.raises(
         ValueError,
-        match='You need to specify either the usage page and usage or the extended usage'
+        match='You need to specify either the usage page and usage or the extended usage',
     ):
         hid_parser.Usage(0x1234, 0x4321, extended_usage=0x12344321)
 

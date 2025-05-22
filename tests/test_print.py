@@ -172,4 +172,4 @@ def test_print(rdesc_raw, file):
 
     hid_parser.ReportDescriptor(rdesc_raw).print(file=capture)
 
-    assert capture.getvalue() == open(abs_file, 'r').read()
+    assert capture.getvalue() == open(abs_file).read()

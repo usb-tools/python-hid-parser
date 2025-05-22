@@ -1,6 +1,6 @@
 # SPDX-License-Identifier: MIT
 
-from __future__ import annotations  # noqa:F407
+from __future__ import annotations
 
 import functools
 import struct
@@ -9,7 +9,16 @@ import textwrap
 import typing
 import warnings
 
-from typing import Any, Dict, Iterable, Iterator, List, Optional, Sequence, TextIO, Tuple, Union
+from collections.abc import Iterable, Iterator, Sequence
+from typing import (
+    Any,
+    Dict,
+    List,
+    Optional,
+    TextIO,
+    Tuple,
+    Union,
+)
 
 
 if sys.version_info >= (3, 8):
@@ -39,13 +48,13 @@ class HIDUnsupportedWarning(HIDWarning):
     pass
 
 
-class Type():
+class Type:
     MAIN = 0
     GLOBAL = 1
     LOCAL = 2
 
 
-class TagMain():
+class TagMain:
     INPUT = 0b1000
     OUTPUT = 0b1001
     FEATURE = 0b1011
@@ -53,7 +62,7 @@ class TagMain():
     END_COLLECTION = 0b1100
 
 
-class TagGlobal():
+class TagGlobal:
     USAGE_PAGE = 0b0000
     LOGICAL_MINIMUM = 0b0001
     LOGICAL_MAXIMUM = 0b0010
@@ -76,7 +85,7 @@ class TagGlobal():
     )
 
 
-class TagLocal():
+class TagLocal:
     USAGE = 0b0000
     USAGE_MINIMUM = 0b0001
     USAGE_MAXIMUM = 0b0010
@@ -122,12 +131,12 @@ def _data_bit_shift(data: Sequence[int], offset: int, length: int) -> Sequence[i
         shifted[shifted_offset] = data[i] >> right_extra
 
         if i - start_offset >= 0:
-            shifted[shifted_offset] |= (data[i - 1] & (0xff >> (8 - right_extra))) << (8 - right_extra)
+            shifted[shifted_offset] |= (data[i - 1] & (0xFF >> (8 - right_extra))) << (8 - right_extra)
 
         shifted_offset -= 1
         i -= 1
 
-    shifted[0] &= 0xff >> ((left_extra + right_extra) % 8)
+    shifted[0] &= 0xFF >> ((left_extra + right_extra) % 8)
 
     if not len(shifted) == byte_length:
         raise ValueError('Invalid data')
@@ -150,18 +159,18 @@ class BitNumber(int):
 
     @property
     def byte(self) -> int:
-        '''
+        """
         Number of bytes
-        '''
+        """
         return self._value // 8
 
     @property
     def bit(self) -> int:
-        '''
+        """
         Number of unaligned bits
 
         n.byte * 8 + n.bits = n
-        '''
+        """
         if self.byte == 0:
             return self._value
 
@@ -189,19 +198,19 @@ class BitNumber(int):
         return ' '.join(parts)
 
 
-class Usage():
+class Usage:
     def __init__(
         self,
         page: Optional[int] = None,
         usage: Optional[int] = None,
         *,
-        extended_usage: Optional[int] = None
+        extended_usage: Optional[int] = None,
     ) -> None:
         if extended_usage and page and usage:
             raise ValueError('You need to specify either the usage page and usage or the extended usage')
         if extended_usage is not None:
             self.page = extended_usage >> (2 * 8)
-            self.usage = extended_usage & 0xffff
+            self.usage = extended_usage & 0xFFFF
         elif page is not None and usage is not None:
             self.page = page
             self.usage = usage
@@ -249,7 +258,7 @@ class Usage():
         return typing.cast(Tuple[hid_parser.data.UsageTypes], types)
 
 
-class UsageValue():
+class UsageValue:
     def __init__(self, item: MainItem, value: int):
         self._item = item
         self._value = value
@@ -312,7 +321,7 @@ class VendorUsageValue(UsageValue):
         return self._list
 
 
-class BaseItem():
+class BaseItem:
     def __init__(self, offset: int, size: int):
         self._offset = BitNumber(offset)
         self._size = BitNumber(size)
@@ -424,9 +433,7 @@ class VariableItem(MainItem):
 
         try:
             if all(usage_type in self._INCOMPATIBLE_TYPES for usage_type in usage.usage_types):
-                warnings.warn(HIDComplianceWarning(
-                    f'{usage} has no compatible usage types with a variable item'
-                ))
+                warnings.warn(HIDComplianceWarning(f'{usage} has no compatible usage types with a variable item'))
         except (KeyError, ValueError):
             pass
 
@@ -436,13 +443,9 @@ class VariableItem(MainItem):
     def parse(self, data: Sequence[int]) -> UsageValue:
         data = _data_bit_shift(data, self.offset, self.size)
 
-        if (
-            hid_parser.data.UsageTypes.LINEAR_CONTROL in self.usage.usage_types
-            or any(
-                usage_type in hid_parser.data.UsageTypesData
-                and usage_type != hid_parser.data.UsageTypes.SELECTOR
-                for usage_type in self.usage.usage_types
-            )
+        if hid_parser.data.UsageTypes.LINEAR_CONTROL in self.usage.usage_types or any(
+            usage_type in hid_parser.data.UsageTypesData and usage_type != hid_parser.data.UsageTypes.SELECTOR
+            for usage_type in self.usage.usage_types
         ):  # int
             value = int.from_bytes(data, byteorder='little')
         elif (
@@ -509,7 +512,10 @@ class ArrayItem(MainItem):
         hid_parser.data.UsageTypes.USAGE_MODIFIER,
     )
     _IGNORE_USAGE_VALUES = (
-        (hid_parser.data.UsagePages.KEYBOARD_KEYPAD_PAGE, hid_parser.data.KeyboardKeypad.NO_EVENT),
+        (
+            hid_parser.data.UsagePages.KEYBOARD_KEYPAD_PAGE,
+            hid_parser.data.KeyboardKeypad.NO_EVENT,
+        ),
     )
 
     def __init__(
@@ -534,9 +540,7 @@ class ArrayItem(MainItem):
                 raise ValueError(f'Mismatching usage page in usage: {usage} (expecting {self._usages[0]})')
             try:
                 if all(usage_type in self._INCOMPATIBLE_TYPES for usage_type in usage.usage_types):
-                    warnings.warn(HIDComplianceWarning(
-                        f'{usage} has no compatible usage types with an array item'
-                    ))
+                    warnings.warn(HIDComplianceWarning(f'{usage} has no compatible usage types with an array item'))
             except (KeyError, ValueError):
                 pass
 
@@ -546,25 +550,29 @@ class ArrayItem(MainItem):
             self._ignore_usages.append(Usage(page, usage_id))
 
     def __repr__(self) -> str:
-        return textwrap.dedent('''
+        return (
+            textwrap.dedent("""
             ArrayItem(
                 offset={}, size={}, count={},
                 usages=[
                     {},
                 ],
             )
-        ''').strip().format(
-            self.offset,
-            self.size,
-            self.count,
-            ',\n        '.join(repr(usage) for usage in self.usages),
+        """)
+            .strip()
+            .format(
+                self.offset,
+                self.size,
+                self.count,
+                ',\n        '.join(repr(usage) for usage in self.usages),
+            )
         )
 
     def parse(self, data: Sequence[int]) -> Dict[Usage, UsageValue]:
         usage_values: Dict[Usage, UsageValue] = {}
 
         for i in range(self.count):
-            aligned_data = _data_bit_shift(data, self.offset + i*8, self.size)
+            aligned_data = _data_bit_shift(data, self.offset + i * 8, self.size)
             usage = Usage(self._page, int.from_bytes(aligned_data, byteorder='little'))
 
             if usage in self._ignore_usages:
@@ -583,8 +591,7 @@ class ArrayItem(MainItem):
                 continue
 
             if usage in self._usages and all(
-                usage_type not in self._INCOMPATIBLE_TYPES
-                for usage_type in usage.usage_types
+                usage_type not in self._INCOMPATIBLE_TYPES for usage_type in usage.usage_types
             ):
                 usage_values[usage] = UsageValue(self, True)
 
@@ -607,7 +614,7 @@ class InvalidReportDescriptor(Exception):
 _ITEM_POOL = Dict[Optional[int], List[BaseItem]]
 
 
-class ReportDescriptor():
+class ReportDescriptor:
     def __init__(self, data: Sequence[int]) -> None:
         self._data = data
 
@@ -730,7 +737,7 @@ class ReportDescriptor():
                 if i + size > len(self.data):
                     raise InvalidReportDescriptor(f'Invalid size: expecting >={i + size}, got {len(self.data)}')
 
-                data, = struct.unpack(fmt, bytes(self.data[i:i+size]))
+                (data,) = struct.unpack(fmt, bytes(self.data[i : i + size]))
 
             yield typ, tag, data
 
@@ -763,12 +770,12 @@ class ReportDescriptor():
         item: BaseItem
         is_array = flags & (1 << 1) == 0  # otherwise variable
 
-        '''
+        """
         HID 1.11, 6.2.2.9 says reports can be byte aligned by declaring a
         main item without usage. A main item can have multiple usages, as I
         interpret it, items are only considered padding when they have NO
         usages.
-        '''
+        """
         if len(usages) == 0 or not usages:
             for _ in range(report_count):
                 item = PaddingItem(offset_list[report_id], report_size)
@@ -824,9 +831,7 @@ class ReportDescriptor():
         local: Dict[str, Any] = {}
 
         for typ, tag, data in self._iterate_raw():
-
             if typ == Type.MAIN:
-
                 if tag in (TagMain.COLLECTION, TagMain.END_COLLECTION):
                     usages = []
 
@@ -850,7 +855,7 @@ class ReportDescriptor():
                         report_size,
                         usages,
                         data,
-                        {**glob, **local}
+                        {**glob, **local},
                     )
 
                 elif tag == TagMain.OUTPUT:
@@ -864,7 +869,7 @@ class ReportDescriptor():
                         report_size,
                         usages,
                         data,
-                        {**glob, **local}
+                        {**glob, **local},
                     )
 
                 elif tag == TagMain.FEATURE:
@@ -878,7 +883,7 @@ class ReportDescriptor():
                         report_size,
                         usages,
                         data,
-                        {**glob, **local}
+                        {**glob, **local},
                     )
 
                 # clear local
@@ -889,7 +894,6 @@ class ReportDescriptor():
                 # we don't care about collections for now, maybe in the future...
 
             elif typ == Type.GLOBAL:
-
                 if tag == TagGlobal.USAGE_PAGE:
                     usage_page = data
 
@@ -918,9 +922,9 @@ class ReportDescriptor():
                             offset_list[report_id] = 0
 
                 elif tag in (TagGlobal.UNIT, TagGlobal.UNIT_EXPONENT):
-                    warnings.warn(HIDUnsupportedWarning(
-                        "Data specifies a unit or unit exponent, but we don't support those yet"
-                    ))
+                    warnings.warn(
+                        HIDUnsupportedWarning("Data specifies a unit or unit exponent, but we don't support those yet")
+                    )
 
                 elif tag == TagGlobal.REPORT_COUNT:
                     report_count = data
@@ -929,7 +933,6 @@ class ReportDescriptor():
                     raise NotImplementedError(f'Unsupported global tag: {bin(tag)}')
 
             elif typ == Type.LOCAL:
-
                 if tag == TagLocal.USAGE:
                     if usage_page is None:
                         raise InvalidReportDescriptor('Usage field found but no usage page')
@@ -947,7 +950,11 @@ class ReportDescriptor():
                         usages.append(Usage(usage_page, i))
                     usage_min = None
 
-                elif tag in (TagLocal.STRING_INDEX, TagLocal.STRING_MINIMUM, TagLocal.STRING_MAXIMUM):
+                elif tag in (
+                    TagLocal.STRING_INDEX,
+                    TagLocal.STRING_MINIMUM,
+                    TagLocal.STRING_MAXIMUM,
+                ):
                     pass  # we don't care about this information to parse the reports
 
                 else:
@@ -979,7 +986,6 @@ class ReportDescriptor():
 
         for typ, tag, data in self._iterate_raw():
             if typ == Type.MAIN:
-
                 if tag == TagMain.INPUT:
                     if data is None:
                         raise InvalidReportDescriptor('Invalid input item')
@@ -1004,7 +1010,6 @@ class ReportDescriptor():
                     printl('End Collection')
 
             elif typ == Type.GLOBAL:
-
                 if tag == TagGlobal.USAGE_PAGE:
                     try:
                         printl(f'Usage Page ({hid_parser.data.UsagePages.get_description(data)})')
@@ -1049,7 +1054,6 @@ class ReportDescriptor():
                     printl(f'Pop ({data})')
 
             elif typ == Type.LOCAL:
-
                 if tag == TagLocal.USAGE:
                     if usage_data is False:
                         raise InvalidReportDescriptor('Usage field found but no usage page')

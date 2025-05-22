@@ -1,11 +1,12 @@
 # SPDX-License-Identifier: MIT
 
 import sys
+import warnings
 
 import pytest
 
 import hid_parser
-import warnings
+
 
 def test_baseitem():
     item = hid_parser.BaseItem(1, 2)
@@ -121,8 +122,10 @@ def test_variableitem():
 
 @pytest.mark.skipif(sys.version_info < (3, 8), reason='repr behaves differently before 3.8')
 def test_variableitem_repr():
-    assert repr(hid_parser.VariableItem(1, 2, 0, hid_parser.Usage(0x0001, 0x0030), -1, 1)) == \
-        'VariableItem(offset=1bit, size=2bits, usage=Usage(page=Generic Desktop Controls, usage=X))'
+    assert (
+        repr(hid_parser.VariableItem(1, 2, 0, hid_parser.Usage(0x0001, 0x0030), -1, 1))
+        == 'VariableItem(offset=1bit, size=2bits, usage=Usage(page=Generic Desktop Controls, usage=X))'
+    )
 
 
 def test_variableitem_compliance():
