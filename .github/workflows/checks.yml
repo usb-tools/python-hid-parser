@@ -15,22 +15,20 @@ jobs:
       fail-fast: false
       matrix:
         python: ['3.9', '3.10', '3.11', '3.12', '3.13']
-
+    env:
+      VIRTUAL_ENV: .venv
     steps:
     - name: Checkout
       uses: actions/checkout@v4
 
-    - name: Set up Python
-      uses: actions/setup-python@v5
+    - name: Install uv
+      uses: astral-sh/setup-uv@v5
 
-    - name: Install mypy
-      run: |
-        pip install --upgrade pip
-        pip install mypy
-        mypy --version
+    - name: Setup venv
+      run: uv venv
 
     - name: Install dependencies
-      run: pip install typing-extensions
+      run: uv sync
 
     - name: Run mypy
-      run: mypy --python-version ${{ matrix.python }} -p hid_parser
+      run: uv run mypy --python-version ${{ matrix.python }} -p hid_parser

@@ -15,26 +15,23 @@ jobs:
       fail-fast: false
       matrix:
         python: ['3.9', '3.10', '3.11', '3.12', '3.13']
-
+    env:
+      VIRTUAL_ENV: .venv
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Set up target Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: ${{ matrix.python }}
+      - name: Install uv
+        uses: astral-sh/setup-uv@v5
 
-      - name: Set up Python
-        uses: actions/setup-python@v5
+      - name: Setup Python
+        run: uv python install ${{ matrix.python }}
 
-      - name: Install nox
-        run: |
-            pip install nox
-            nox --version
+      - name: Setup venv
+        run: uv venv
 
       - name: Run tests
-        run: nox -s test-${{ matrix.python }}
+        run: uv run nox -s test-${{ matrix.python }}
 
       - name: Send coverage report
         uses: codecov/codecov-action@v5
