@@ -37,6 +37,9 @@ test = [
   'hypothesis'
 ]
 
+[tool.uv]
+default-groups = ['test']
+
 [tool.ruff]
 line-length = 120
 
