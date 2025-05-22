@@ -26,6 +26,9 @@ classifiers = [
 urls.homepage = 'https://github.com/usb-tools/python-hid-parser'
 urls.issues = 'https://github.com/usb-tools/python-hid-parser/issues'
 urls.source = 'https://github.com/usb-tools/python-hid-parser'
+dependencies = [
+  'typing_extensions >= 4.4.0; python_version < "3.13"'
+]
 
 [dependency-groups]
 test = [

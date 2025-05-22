@@ -1,8 +1,16 @@
 # SPDX-License-Identifier: MIT
 
 import enum
+import sys
 
-from typing import Any, ClassVar, Optional
+from collections.abc import Collection
+from typing import Any, Generic, Optional, Union
+
+
+if sys.version_info >= (3, 13):
+    from typing import TypeVar
+else:
+    from typing_extensions import TypeVar
 
 
 class _DataMeta(type):
@@ -42,15 +50,15 @@ class _DataMeta(type):
     This metaclass also does some verification to prevent duplicated data.
     """
 
-    def __new__(mcs, name: str, bases: tuple[Any], dic: dict[str, Any]):  # type: ignore[no-untyped-def]  # noqa: C901
-        dic['_single'] = {}
-        dic['_range'] = []
+    def __new__(cls, name: str, bases: tuple[Any], obj_dict: dict[str, Any]):  # type: ignore[no-untyped-def]  # noqa: C901
+        obj_dict['_single'] = {}
+        obj_dict['_range'] = []
 
-        # allow constructing data via a data dictionary as opposed to directly in the object body
-        if 'data' in dic:
-            data = dic.pop('data')
+        # allow constructing data via a data obj_dicttionary as opposed to directly in the object body
+        if 'data' in obj_dict:
+            data = obj_dict.pop('data')
         else:
-            data = dic
+            data = obj_dict
 
         for attr in data:
             if not attr.startswith('_') and isinstance(data[attr], tuple):
@@ -67,17 +75,17 @@ class _DataMeta(type):
                         msg = f"Second element of '{attr}' should be a string"
                         raise TypeError(msg)
 
-                    if num in dic['_single']:
+                    if num in obj_dict['_single']:
                         msg = f"Duplicated value in '{attr}' ({num})"
                         raise ValueError(msg)
 
-                    for nmin, nmax, _ in dic['_range']:
+                    for nmin, nmax, _ in obj_dict['_range']:
                         if nmin <= num <= nmax:
                             msg = f"Duplicated value in '{attr}' ({num})"
                             raise ValueError(msg)
 
-                    dic[attr] = num
-                    dic['_single'][num] = desc, sub
+                    obj_dict[attr] = num
+                    obj_dict['_single'][num] = desc, sub
                 elif len(data[attr]) == 5:  # range
                     nmin, el, nmax, desc, sub = data[attr]
 
@@ -94,33 +102,36 @@ class _DataMeta(type):
                         msg = f"Fourth element of '{attr}' should be a string"
                         raise TypeError(msg)
 
-                    for num in dic['_single']:
+                    for num in obj_dict['_single']:
                         if nmin <= num <= nmax:
                             msg = f"Duplicated value in '{attr}' ({num})"
                             raise ValueError(msg)
 
-                    dic[attr] = range(nmin, nmax + 1)
-                    dic['_range'].append((nmin, nmax, (desc, sub)))
+                    obj_dict[attr] = range(nmin, nmax + 1)
+                    obj_dict['_range'].append((nmin, nmax, (desc, sub)))
 
                 else:
                     msg = f'Invalid field: {attr}'
                     raise ValueError(msg)
 
-        return super().__new__(mcs, name, bases, dic)
+        return super().__new__(cls, name, bases, obj_dict)
 
 
-class _Data(metaclass=_DataMeta):
+_SubdataType = TypeVar('_SubdataType', default=None)
+
+
+class _Data(Generic[_SubdataType], metaclass=_DataMeta):
     """
     This class provides a get_description method to get data out of _single and _range.
     See the _DataMeta documentation for more information.
     """
 
-    _DATA = tuple[str, Optional[Any]]
-    _single: dict[int, _DATA]
-    _range: list[tuple[int, int, _DATA]]
+    _single: dict[int, tuple[str, _SubdataType]]
+    _range: list[tuple[int, int, tuple[str, _SubdataType]]]
+    data: dict[str, tuple[int, str, _SubdataType]]
 
     @classmethod
-    def _get_data(cls, num: Optional[int]) -> _DATA:
+    def _get_data(cls, num: Optional[int]) -> tuple[str, _SubdataType]:
         if num is None:
             msg = 'Data index is not an int'
             raise KeyError(msg)
@@ -140,7 +151,7 @@ class _Data(metaclass=_DataMeta):
         return cls._get_data(num)[0]
 
     @classmethod
-    def get_subdata(cls, num: Optional[int]) -> Any:
+    def get_subdata(cls, num: Optional[int]) -> _SubdataType:
         subdata = cls._get_data(num)[1]
 
         if not subdata:
@@ -210,7 +221,11 @@ class Collections(_Data):
     VENDOR = 0x80, ..., 0xFF, 'Vendor'
 
 
-class GenericDesktopControls(_Data):
+class UsagePage(_Data[Union[UsageTypes, Collection[UsageTypes]]]):
+    pass
+
+
+class GenericDesktopControls(UsagePage):
     POINTER = 0x01, 'Pointer', UsageTypes.CP
     MOUSE = 0x02, 'Mouse', UsageTypes.CA
     JOYSTICK = 0x04, 'Joystick', UsageTypes.CA
@@ -282,7 +297,7 @@ class GenericDesktopControls(_Data):
     SYSTEM_DISPLAY_LCD_AUTOSCALE = 0xB7, 'System Display LCD Autoscale', UsageTypes.OSC
 
 
-class KeyboardKeypad(_Data):
+class KeyboardKeypad(UsagePage):
     NO_EVENT = 0x00, 'No event indicated', UsageTypes.SEL
     KEYBOARD_ERROR_ROLL_OVER = 0x01, 'Keyboard ErrorRollOver', UsageTypes.SEL
     KEYBOARD_POST = 0x02, 'Keyboard POSTFail', UsageTypes.SEL
@@ -504,7 +519,7 @@ class KeyboardKeypad(_Data):
     KEYBOARD_RIGHT_GUI = 0xE7, 'Keyboard Right GUI', UsageTypes.DV
 
 
-class Led(_Data):
+class Led(UsagePage):
     NUM_LOCK = 0x01, 'Num Lock', UsageTypes.OOC
     CAPS_LOCK = 0x02, 'Caps Lock', UsageTypes.OOC
     SCROLL_LOCK = 0x03, 'Scroll Lock', UsageTypes.OOC
@@ -584,7 +599,7 @@ class Led(_Data):
     EXTERNAL_POWER_CONNECTED = 0x4D, 'External Power Connected', UsageTypes.OOC
 
 
-class Button(_Data):
+class Button(UsagePage):
     _USAGE_TYPES = (
         UsageTypes.SEL,
         UsageTypes.OOC,
@@ -592,7 +607,11 @@ class Button(_Data):
         UsageTypes.OSC,
     )
 
-    data: ClassVar[dict[str, tuple[int, str, UsageTypes]]] = {
+    # XXX: The type of the 'data' variable includes a generic type bound to the
+    #      class, which currently isn't supported in ClassVar, so we don't
+    #      define 'data' as a ClassVar. Ruff complains about it in RUF012, but
+    #      since we can't define `data` as ClassVar, let's just ignore it.
+    data = {  # noqa: RUF012
         'NO_BUTTON': (0x0000, 'Button 1 (primary/trigger)', _USAGE_TYPES),
         'BUTTON_1': (0x0001, 'Button 1 (primary/trigger)', _USAGE_TYPES),
         'BUTTON_2': (0x0002, 'Button 2 (secondary)', _USAGE_TYPES),
@@ -603,7 +622,7 @@ class Button(_Data):
         data[f'BUTTON_{_i}'] = _i, f'Button {_i}', _USAGE_TYPES
 
 
-class Consumer(_Data):
+class Consumer(UsagePage):
     CONSUMER_CONTROL = 0x0001, 'Consumer Control', UsageTypes.CA
     NUMERIC_KEY_PAD = 0x0002, 'Numeric Key Pad', UsageTypes.NARY
     PROGRAMMABLE_BUTTONS = 0x0003, 'Programmable Buttons', UsageTypes.NARY
@@ -970,7 +989,7 @@ class Consumer(_Data):
     AC_DISTRIBUTE_VERTICALLY = 0x029C, 'AC Distribute Vertically', UsageTypes.SEL
 
 
-class PowerDevice(_Data):
+class PowerDevice(UsagePage):
     INAME = 0x01, 'iName', UsageTypes.SV
     PRESENT_STATUS = 0x02, 'PresentStatus', UsageTypes.CL
     CHARGED_STATUS = 0x03, 'ChangedStatus', UsageTypes.CL
@@ -1050,13 +1069,13 @@ class PowerDevice(_Data):
     ISERIALNUMBER = 0xFF, 'iSerialNumber', UsageTypes.SV
 
 
-class FIDO(_Data):
+class FIDO(UsagePage):
     U2F_AUTHENTICATOR_DEVICEM = 0x01, 'U2F Authenticator Device'
     INPUT_REPORT_DATA = 0x20, 'Input Report Data'
     OUTPUT_REPORT_DATA = 0x21, 'Output Report Data'
 
 
-class UsagePages(_Data):
+class UsagePages(_Data[UsagePage]):
     GENERIC_DESKTOP_CONTROLS_PAGE = 0x01, 'Generic Desktop Controls', GenericDesktopControls
     SIMULATION_CONTROLS_PAGE = 0x02, 'Simulation Controls'
     VR_CONTROLS_PAGE = 0x03, 'VR Controls'

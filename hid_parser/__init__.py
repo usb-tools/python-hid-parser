@@ -8,7 +8,7 @@ import textwrap
 import typing
 import warnings
 
-from collections.abc import Iterable, Iterator, Sequence
+from collections.abc import Collection, Iterable, Iterator, Sequence
 from typing import Any, Literal, Optional, TextIO
 
 import hid_parser.data
@@ -233,20 +233,14 @@ class Usage:
         return f'Usage(page={page_str}, usage={usage_str})'
 
     @property
-    def usage_types(self) -> tuple[hid_parser.data.UsageTypes]:
-        subdata = hid_parser.data.UsagePages.get_subdata(self.page).get_subdata(self.usage)
+    def usage_types(self) -> Collection[hid_parser.data.UsageTypes]:
+        usage_page = hid_parser.data.UsagePages.get_subdata(self.page)
+        usage_types = usage_page.get_subdata(self.usage)
 
-        if isinstance(subdata, tuple):
-            types = subdata
-        else:
-            types = (subdata,)
+        if not isinstance(usage_types, Collection):
+            usage_types = (usage_types,)
 
-        for typ in types:
-            if not isinstance(typ, hid_parser.data.UsageTypes):
-                msg = f"Expecting usage type but got '{type(typ)}'"
-                raise TypeError(msg)
-
-        return typing.cast(tuple[hid_parser.data.UsageTypes], types)
+        return usage_types
 
 
 class UsageValue:
@@ -794,7 +788,8 @@ class ReportDescriptor:
                 if len(usages) > report_count:
                     report_count = len(usages)
                 else:
-                    usages += [] * report_count - len(usages)
+                    missing_usage_count = report_count - len(usages)
+                    usages += [] * missing_usage_count
 
             for usage in usages:
                 item = VariableItem(
@@ -989,7 +984,7 @@ class ReportDescriptor:
         def printl(string: str) -> None:
             print(' ' * level + string, file=file)
 
-        usage_data: Literal[False] | hid_parser.data._Data | None = False
+        usage_page: Literal[False] | hid_parser.data.UsagePage | None = False
 
         for typ, tag, data in self._iterate_raw():
             if typ == Type.MAIN:
@@ -1024,9 +1019,9 @@ class ReportDescriptor:
                     try:
                         printl(f'Usage Page ({hid_parser.data.UsagePages.get_description(data)})')
                         try:
-                            usage_data = hid_parser.data.UsagePages.get_subdata(data)
+                            usage_page = hid_parser.data.UsagePages.get_subdata(data)
                         except ValueError:
-                            usage_data = None
+                            usage_page = None
                     except KeyError:
                         printl(f'Usage Page (Unknown 0x{data:04x})')
 
@@ -1065,13 +1060,13 @@ class ReportDescriptor:
 
             elif typ == Type.LOCAL:
                 if tag == TagLocal.USAGE:
-                    if usage_data is False:
+                    if usage_page is False:
                         msg = 'Usage field found but no usage page'
                         raise InvalidReportDescriptor(msg)
 
-                    if usage_data:
+                    if usage_page:
                         try:
-                            printl(f'Usage ({usage_data.get_description(data)})')
+                            printl(f'Usage ({usage_page.get_description(data)})')
                         except KeyError:
                             printl(f'Usage (Unknown, 0x{data:04x})')
                     else:
