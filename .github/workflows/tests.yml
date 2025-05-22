@@ -37,7 +37,7 @@ jobs:
         run: nox -s test-${{ matrix.python }}
 
       - name: Send coverage report
-        uses: codecov/codecov-action@v1
+        uses: codecov/codecov-action@v5
         env:
           PYTHON: ${{ matrix.python }}
         with:
