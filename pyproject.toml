@@ -36,9 +36,13 @@ test = [
   'pytest-cov',
   'hypothesis'
 ]
+dev = [
+  'mypy',
+  'nox',
+]
 
 [tool.uv]
-default-groups = ['test']
+default-groups = ['test', 'dev']
 
 [tool.ruff]
 line-length = 120
