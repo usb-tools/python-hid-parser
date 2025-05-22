@@ -22,13 +22,11 @@ def test(session):
     htmlcov_output = os.path.join(session.virtualenv.location, 'htmlcov')
     xmlcov_output = os.path.join(session.virtualenv.location, f'coverage-{session.python}.xml')
 
-    session.install('.[test]')
+    session.install('.', '--group', 'test')
 
     session.run(
         'pytest',
         '--cov',
-        '--cov-config',
-        'setup.cfg',
         f'--cov-report=html:{htmlcov_output}',
         f'--cov-report=xml:{xmlcov_output}',
         'tests/',
