@@ -14,7 +14,7 @@ from typing import Any, Literal, Optional, TextIO
 import hid_parser.data
 
 
-__version__ = '0.0.3'
+__version__ = '0.1.0'
 
 
 class HIDWarning(Warning):

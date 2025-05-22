@@ -5,7 +5,7 @@ build-backend = 'flit_core.buildapi'
 [project]
 name = 'hid-parser'
 description = 'Typed pure Python library to parse HID report descriptors'
-version = '0.0.3'
+version = '0.1.0'
 readme = 'README.md'
 requires-python = '>= 3.9'
 license = {file = 'LICENSE'}
