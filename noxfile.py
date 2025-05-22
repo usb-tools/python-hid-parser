@@ -6,6 +6,7 @@ import os.path
 import nox
 
 
+nox.options.default_venv_backend = 'uv|virtualenv'
 nox.options.sessions = ['mypy', 'test']
 nox.options.reuse_existing_virtualenvs = True
 
