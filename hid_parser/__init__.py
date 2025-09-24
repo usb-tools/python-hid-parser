@@ -788,8 +788,7 @@ class ReportDescriptor:
                 if len(usages) > report_count:
                     report_count = len(usages)
                 else:
-                    missing_usage_count = report_count - len(usages)
-                    usages += [] * missing_usage_count
+                    usages.append(usages[0])
 
             for usage in usages:
                 item = VariableItem(
