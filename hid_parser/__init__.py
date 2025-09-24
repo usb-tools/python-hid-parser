@@ -794,11 +794,11 @@ class ReportDescriptor:
                     usages = usages[:report_count]
                 else:
                     x_usage = Usage(
-                        hid_parser.data.UsagePages.GENERIC_DESKTOP_CONTROLS_PAGE, 
+                        hid_parser.data.UsagePages.GENERIC_DESKTOP_CONTROLS_PAGE,
                         hid_parser.data.GenericDesktopControls.X
                         )
                     y_usage = Usage(
-                        hid_parser.data.UsagePages.GENERIC_DESKTOP_CONTROLS_PAGE, 
+                        hid_parser.data.UsagePages.GENERIC_DESKTOP_CONTROLS_PAGE,
                         hid_parser.data.GenericDesktopControls.Y
                         )
                     if report_count > len(usages) and usages and usages[0] in (x_usage, y_usage):
@@ -811,7 +811,6 @@ class ReportDescriptor:
                         warning_message = f'Report count ({report_count}) is greater than number of \
                             usages ({len(usages)}), share the unused usage count to next usage'
                         warnings.warn(HIDComplianceWarning(warning_message), stacklevel=2)
-                    
 
             for usage in usages:
                 item = VariableItem(
