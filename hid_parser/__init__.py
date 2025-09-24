@@ -783,9 +783,9 @@ class ReportDescriptor:
             self._append_item(offset_list, pool, report_id, item)
         else:
             if len(usages) != report_count:
-                error_str = f'Expecting {report_count} usages but got {len(usages)}'
-                warnings.warn(HIDComplianceWarning(error_str), stacklevel=2)
                 if len(usages) > report_count:
+                    error_str = f'Expecting {report_count} usages but got {len(usages)}'
+                    warnings.warn(HIDComplianceWarning(error_str), stacklevel=2)
                     report_count = len(usages)
                 else:
                     for i in range(report_count - len(usages)):
