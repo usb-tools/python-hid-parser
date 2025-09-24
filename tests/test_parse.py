@@ -159,6 +159,260 @@ linux_hidpp_rdesc = [
     0xc0,              # End Collection                      233
 ]
 
+windows_touch_rdesc = [
+    0x05, 0x0D,        # Usage Page (Digitizer)
+    0x09, 0x04,        # Usage (Touch Screen)
+    0xA1, 0x01,        # Collection (Application)
+    0x85, 0x01,        #   Report ID (1)
+    0x09, 0x22,        #   Usage (Finger)
+    0xA1, 0x02,        #   Collection (Logical)
+    0x09, 0x42,        #     Usage (Tip Switch)
+    0x15, 0x00,        #     Logical Minimum (0)
+    0x25, 0x01,        #     Logical Maximum (1)
+    0x35, 0x00,        #     Physical Minimum (0)
+    0x45, 0x01,        #     Physical Maximum (1)
+    0x65, 0x00,        #     Unit (None)
+    0x55, 0x00,        #     Unit Exponent (0)
+    0x75, 0x01,        #     Report Size (1)
+    0x95, 0x01,        #     Report Count (1)
+    0x81, 0x02,        #     Input (Data,Var,Abs,No Wrap,Linear,Preferred State,No Null Position)
+    0x81, 0x03,        #     Input (Const,Var,Abs,No Wrap,Linear,Preferred State,No Null Position)
+    0x09, 0x51,        #     Usage (0x51)
+    0x25, 0x3F,        #     Logical Maximum (63)
+    0x45, 0x00,        #     Physical Maximum (0)
+    0x75, 0x05,        #     Report Size (5)
+    0x81, 0x02,        #     Input (Data,Var,Abs,No Wrap,Linear,Preferred State,No Null Position)
+    0x09, 0x47,        #     Usage (0x47)
+    0x25, 0x01,        #     Logical Maximum (1)
+    0x45, 0x01,        #     Physical Maximum (1)
+    0x75, 0x01,        #     Report Size (1)
+    0x81, 0x02,        #     Input (Data,Var,Abs,No Wrap,Linear,Preferred State,No Null Position)
+    0x09, 0x48,        #     Usage (0x48)
+    0x25, 0xFF,        #     Logical Maximum (-1)
+    0x45, 0xFF,        #     Physical Maximum (-1)
+    0x65, 0x11,        #     Unit (System: SI Linear, Length: Centimeter)
+    0x55, 0x0F,        #     Unit Exponent (-1)
+    0x75, 0x08,        #     Report Size (8)
+    0x81, 0x02,        #     Input (Data,Var,Abs,No Wrap,Linear,Preferred State,No Null Position)
+    0x09, 0x49,        #     Usage (0x49)
+    0x81, 0x02,        #     Input (Data,Var,Abs,No Wrap,Linear,Preferred State,No Null Position)
+    0x05, 0x01,        #     Usage Page (Generic Desktop Ctrls)
+    0x09, 0x30,        #     Usage (X)
+    0x26, 0xA4, 0x10,  #     Logical Maximum (4260)
+    0x46, 0x24, 0x01,  #     Physical Maximum (292)
+    0x75, 0x10,        #     Report Size (16)
+    0x95, 0x02,        #     Report Count (2)
+    0x81, 0x02,        #     Input (Data,Var,Abs,No Wrap,Linear,Preferred State,No Null Position)
+    0x09, 0x31,        #     Usage (Y)
+    0x26, 0x04, 0x0B,  #     Logical Maximum (2820)
+    0x45, 0xC2,        #     Physical Maximum (-62)
+    0x81, 0x02,        #     Input (Data,Var,Abs,No Wrap,Linear,Preferred State,No Null Position)
+    0xC1, 0x00,        #   End Collection
+    0x05, 0x0D,        #   Usage Page (Digitizer)
+    0x09, 0x22,        #   Usage (Finger)
+    0xA1, 0x02,        #   Collection (Logical)
+    0x09, 0x42,        #     Usage (Tip Switch)
+    0x25, 0x01,        #     Logical Maximum (1)
+    0x45, 0x01,        #     Physical Maximum (1)
+    0x65, 0x00,        #     Unit (None)
+    0x55, 0x00,        #     Unit Exponent (0)
+    0x75, 0x01,        #     Report Size (1)
+    0x95, 0x01,        #     Report Count (1)
+    0x81, 0x02,        #     Input (Data,Var,Abs,No Wrap,Linear,Preferred State,No Null Position)
+    0x81, 0x03,        #     Input (Const,Var,Abs,No Wrap,Linear,Preferred State,No Null Position)
+    0x09, 0x51,        #     Usage (0x51)
+    0x25, 0x3F,        #     Logical Maximum (63)
+    0x45, 0x00,        #     Physical Maximum (0)
+    0x75, 0x05,        #     Report Size (5)
+    0x81, 0x02,        #     Input (Data,Var,Abs,No Wrap,Linear,Preferred State,No Null Position)
+    0x09, 0x47,        #     Usage (0x47)
+    0x25, 0x01,        #     Logical Maximum (1)
+    0x45, 0x01,        #     Physical Maximum (1)
+    0x75, 0x01,        #     Report Size (1)
+    0x81, 0x02,        #     Input (Data,Var,Abs,No Wrap,Linear,Preferred State,No Null Position)
+    0x09, 0x48,        #     Usage (0x48)
+    0x25, 0xFF,        #     Logical Maximum (-1)
+    0x45, 0xFF,        #     Physical Maximum (-1)
+    0x65, 0x11,        #     Unit (System: SI Linear, Length: Centimeter)
+    0x55, 0x0F,        #     Unit Exponent (-1)
+    0x75, 0x08,        #     Report Size (8)
+    0x81, 0x02,        #     Input (Data,Var,Abs,No Wrap,Linear,Preferred State,No Null Position)
+    0x09, 0x49,        #     Usage (0x49)
+    0x81, 0x02,        #     Input (Data,Var,Abs,No Wrap,Linear,Preferred State,No Null Position)
+    0x05, 0x01,        #     Usage Page (Generic Desktop Ctrls)
+    0x09, 0x30,        #     Usage (X)
+    0x26, 0xA4, 0x10,  #     Logical Maximum (4260)
+    0x46, 0x24, 0x01,  #     Physical Maximum (292)
+    0x75, 0x10,        #     Report Size (16)
+    0x95, 0x02,        #     Report Count (2)
+    0x81, 0x02,        #     Input (Data,Var,Abs,No Wrap,Linear,Preferred State,No Null Position)
+    0x09, 0x31,        #     Usage (Y)
+    0x26, 0x04, 0x0B,  #     Logical Maximum (2820)
+    0x45, 0xC2,        #     Physical Maximum (-62)
+    0x81, 0x02,        #     Input (Data,Var,Abs,No Wrap,Linear,Preferred State,No Null Position)
+    0xC1, 0x00,        #   End Collection
+    0x05, 0x0D,        #   Usage Page (Digitizer)
+    0x09, 0x22,        #   Usage (Finger)
+    0xA1, 0x02,        #   Collection (Logical)
+    0x09, 0x42,        #     Usage (Tip Switch)
+    0x25, 0x01,        #     Logical Maximum (1)
+    0x45, 0x01,        #     Physical Maximum (1)
+    0x65, 0x00,        #     Unit (None)
+    0x55, 0x00,        #     Unit Exponent (0)
+    0x75, 0x01,        #     Report Size (1)
+    0x95, 0x01,        #     Report Count (1)
+    0x81, 0x02,        #     Input (Data,Var,Abs,No Wrap,Linear,Preferred State,No Null Position)
+    0x81, 0x03,        #     Input (Const,Var,Abs,No Wrap,Linear,Preferred State,No Null Position)
+    0x09, 0x51,        #     Usage (0x51)
+    0x25, 0x3F,        #     Logical Maximum (63)
+    0x45, 0x00,        #     Physical Maximum (0)
+    0x75, 0x05,        #     Report Size (5)
+    0x81, 0x02,        #     Input (Data,Var,Abs,No Wrap,Linear,Preferred State,No Null Position)
+    0x09, 0x47,        #     Usage (0x47)
+    0x25, 0x01,        #     Logical Maximum (1)
+    0x45, 0x01,        #     Physical Maximum (1)
+    0x75, 0x01,        #     Report Size (1)
+    0x81, 0x02,        #     Input (Data,Var,Abs,No Wrap,Linear,Preferred State,No Null Position)
+    0x09, 0x48,        #     Usage (0x48)
+    0x25, 0xFF,        #     Logical Maximum (-1)
+    0x45, 0xFF,        #     Physical Maximum (-1)
+    0x65, 0x11,        #     Unit (System: SI Linear, Length: Centimeter)
+    0x55, 0x0F,        #     Unit Exponent (-1)
+    0x75, 0x08,        #     Report Size (8)
+    0x81, 0x02,        #     Input (Data,Var,Abs,No Wrap,Linear,Preferred State,No Null Position)
+    0x09, 0x49,        #     Usage (0x49)
+    0x81, 0x02,        #     Input (Data,Var,Abs,No Wrap,Linear,Preferred State,No Null Position)
+    0x05, 0x01,        #     Usage Page (Generic Desktop Ctrls)
+    0x09, 0x30,        #     Usage (X)
+    0x26, 0xA4, 0x10,  #     Logical Maximum (4260)
+    0x46, 0x24, 0x01,  #     Physical Maximum (292)
+    0x75, 0x10,        #     Report Size (16)
+    0x95, 0x02,        #     Report Count (2)
+    0x81, 0x02,        #     Input (Data,Var,Abs,No Wrap,Linear,Preferred State,No Null Position)
+    0x09, 0x31,        #     Usage (Y)
+    0x26, 0x04, 0x0B,  #     Logical Maximum (2820)
+    0x45, 0xC2,        #     Physical Maximum (-62)
+    0x81, 0x02,        #     Input (Data,Var,Abs,No Wrap,Linear,Preferred State,No Null Position)
+    0xC1, 0x00,        #   End Collection
+    0x05, 0x0D,        #   Usage Page (Digitizer)
+    0x09, 0x22,        #   Usage (Finger)
+    0xA1, 0x02,        #   Collection (Logical)
+    0x09, 0x42,        #     Usage (Tip Switch)
+    0x25, 0x01,        #     Logical Maximum (1)
+    0x45, 0x01,        #     Physical Maximum (1)
+    0x65, 0x00,        #     Unit (None)
+    0x55, 0x00,        #     Unit Exponent (0)
+    0x75, 0x01,        #     Report Size (1)
+    0x95, 0x01,        #     Report Count (1)
+    0x81, 0x02,        #     Input (Data,Var,Abs,No Wrap,Linear,Preferred State,No Null Position)
+    0x81, 0x03,        #     Input (Const,Var,Abs,No Wrap,Linear,Preferred State,No Null Position)
+    0x09, 0x51,        #     Usage (0x51)
+    0x25, 0x3F,        #     Logical Maximum (63)
+    0x45, 0x00,        #     Physical Maximum (0)
+    0x75, 0x05,        #     Report Size (5)
+    0x81, 0x02,        #     Input (Data,Var,Abs,No Wrap,Linear,Preferred State,No Null Position)
+    0x09, 0x47,        #     Usage (0x47)
+    0x25, 0x01,        #     Logical Maximum (1)
+    0x45, 0x01,        #     Physical Maximum (1)
+    0x75, 0x01,        #     Report Size (1)
+    0x81, 0x02,        #     Input (Data,Var,Abs,No Wrap,Linear,Preferred State,No Null Position)
+    0x09, 0x48,        #     Usage (0x48)
+    0x25, 0xFF,        #     Logical Maximum (-1)
+    0x45, 0xFF,        #     Physical Maximum (-1)
+    0x65, 0x11,        #     Unit (System: SI Linear, Length: Centimeter)
+    0x55, 0x0F,        #     Unit Exponent (-1)
+    0x75, 0x08,        #     Report Size (8)
+    0x81, 0x02,        #     Input (Data,Var,Abs,No Wrap,Linear,Preferred State,No Null Position)
+    0x09, 0x49,        #     Usage (0x49)
+    0x81, 0x02,        #     Input (Data,Var,Abs,No Wrap,Linear,Preferred State,No Null Position)
+    0x05, 0x01,        #     Usage Page (Generic Desktop Ctrls)
+    0x09, 0x30,        #     Usage (X)
+    0x26, 0xA4, 0x10,  #     Logical Maximum (4260)
+    0x46, 0x24, 0x01,  #     Physical Maximum (292)
+    0x75, 0x10,        #     Report Size (16)
+    0x95, 0x02,        #     Report Count (2)
+    0x81, 0x02,        #     Input (Data,Var,Abs,No Wrap,Linear,Preferred State,No Null Position)
+    0x09, 0x31,        #     Usage (Y)
+    0x26, 0x04, 0x0B,  #     Logical Maximum (2820)
+    0x45, 0xC2,        #     Physical Maximum (-62)
+    0x81, 0x02,        #     Input (Data,Var,Abs,No Wrap,Linear,Preferred State,No Null Position)
+    0xC1, 0x00,        #   End Collection
+    0x05, 0x0D,        #   Usage Page (Digitizer)
+    0x09, 0x22,        #   Usage (Finger)
+    0xA1, 0x02,        #   Collection (Logical)
+    0x09, 0x42,        #     Usage (Tip Switch)
+    0x25, 0x01,        #     Logical Maximum (1)
+    0x45, 0x01,        #     Physical Maximum (1)
+    0x65, 0x00,        #     Unit (None)
+    0x55, 0x00,        #     Unit Exponent (0)
+    0x75, 0x01,        #     Report Size (1)
+    0x95, 0x01,        #     Report Count (1)
+    0x81, 0x02,        #     Input (Data,Var,Abs,No Wrap,Linear,Preferred State,No Null Position)
+    0x81, 0x03,        #     Input (Const,Var,Abs,No Wrap,Linear,Preferred State,No Null Position)
+    0x09, 0x51,        #     Usage (0x51)
+    0x25, 0x3F,        #     Logical Maximum (63)
+    0x45, 0x00,        #     Physical Maximum (0)
+    0x75, 0x05,        #     Report Size (5)
+    0x81, 0x02,        #     Input (Data,Var,Abs,No Wrap,Linear,Preferred State,No Null Position)
+    0x09, 0x47,        #     Usage (0x47)
+    0x25, 0x01,        #     Logical Maximum (1)
+    0x45, 0x01,        #     Physical Maximum (1)
+    0x75, 0x01,        #     Report Size (1)
+    0x81, 0x02,        #     Input (Data,Var,Abs,No Wrap,Linear,Preferred State,No Null Position)
+    0x09, 0x48,        #     Usage (0x48)
+    0x25, 0xFF,        #     Logical Maximum (-1)
+    0x45, 0xFF,        #     Physical Maximum (-1)
+    0x65, 0x11,        #     Unit (System: SI Linear, Length: Centimeter)
+    0x55, 0x0F,        #     Unit Exponent (-1)
+    0x75, 0x08,        #     Report Size (8)
+    0x81, 0x02,        #     Input (Data,Var,Abs,No Wrap,Linear,Preferred State,No Null Position)
+    0x09, 0x49,        #     Usage (0x49)
+    0x81, 0x02,        #     Input (Data,Var,Abs,No Wrap,Linear,Preferred State,No Null Position)
+    0x05, 0x01,        #     Usage Page (Generic Desktop Ctrls)
+    0x09, 0x30,        #     Usage (X)
+    0x26, 0xA4, 0x10,  #     Logical Maximum (4260)
+    0x46, 0x24, 0x01,  #     Physical Maximum (292)
+    0x75, 0x10,        #     Report Size (16)
+    0x95, 0x02,        #     Report Count (2)
+    0x81, 0x02,        #     Input (Data,Var,Abs,No Wrap,Linear,Preferred State,No Null Position)
+    0x09, 0x31,        #     Usage (Y)
+    0x26, 0x04, 0x0B,  #     Logical Maximum (2820)
+    0x45, 0xC2,        #     Physical Maximum (-62)
+    0x81, 0x02,        #     Input (Data,Var,Abs,No Wrap,Linear,Preferred State,No Null Position)
+    0xC1, 0x00,        #   End Collection
+    0x05, 0x0D,        #   Usage Page (Digitizer)
+    0x09, 0x56,        #   Usage (0x56)
+    0x27, 0xFF, 0xFF, 0xFF, 0x7F,  #   Logical Maximum (2147483646)
+    0x45, 0x00,        #   Physical Maximum (0)
+    0x65, 0x00,        #   Unit (None)
+    0x55, 0x00,        #   Unit Exponent (0)
+    0x75, 0x20,        #   Report Size (32)
+    0x95, 0x01,        #   Report Count (1)
+    0x81, 0x02,        #   Input (Data,Var,Abs,No Wrap,Linear,Preferred State,No Null Position)
+    0x09, 0x54,        #   Usage (0x54)
+    0x25, 0x7F,        #   Logical Maximum (127)
+    0x75, 0x08,        #   Report Size (8)
+    0x81, 0x02,        #   Input (Data,Var,Abs,No Wrap,Linear,Preferred State,No Null Position)
+    0x85, 0x0A,        #   Report ID (10)
+    0x09, 0x55,        #   Usage (0x55)
+    0x25, 0x0A,        #   Logical Maximum (10)
+    0xB1, 0x02,        #   Feature (Data,Var,Abs,No Wrap,Linear,Preferred State,No Null Position,Non-volatile)
+    0x25, 0x01,        #   Logical Maximum (1)
+    0x45, 0x01,        #   Physical Maximum (1)
+    0x75, 0x01,        #   Report Size (1)
+    0x96, 0xF8, 0x07,  #   Report Count (2040)
+    0xB1, 0x03,        #   Feature (Const,Var,Abs,No Wrap,Linear,Preferred State,No Null Position,Non-volatile)
+    0x85, 0x44,        #   Report ID (68)
+    0x06, 0x00, 0xFF,  #   Usage Page (Vendor Defined 0xFF00)
+    0x09, 0xC5,        #   Usage (0xC5)
+    0x25, 0xFF,        #   Logical Maximum (-1)
+    0x45, 0x00,        #   Physical Maximum (0)
+    0x75, 0x08,        #   Report Size (8)
+    0x96, 0x00, 0x01,  #   Report Count (256)
+    0xB1, 0x02,        #   Feature (Data,Var,Abs,No Wrap,Linear,Preferred State,No Null Position,Non-volatile)
+    0xC1, 0x00,        # End Collection
+]
+
 # fmt: on
 
 
@@ -167,6 +421,7 @@ linux_hidpp_rdesc = [
     [
         simple_mouse_rdesc,
         linux_hidpp_rdesc,
+        windows_touch_rdesc,
     ],
 )
 def test_parse(rdesc):
@@ -284,6 +539,82 @@ def test_linux_hidpp_items():
         assert int(item.size) == 8
         assert item.usages == usages
         offset += 8
+
+
+def test_windows_touch_items():
+    rdesc = hid_parser.ReportDescriptor(windows_touch_rdesc)
+
+    assert rdesc.input_report_ids == [1]
+    assert rdesc.output_report_ids == []
+    assert rdesc.feature_report_ids == [10, 68]
+
+    items = rdesc.get_input_items(1)
+
+    assert len(items) == 52
+
+    # First finger contact
+    assert isinstance(items[0], hid_parser.VariableItem)
+    assert int(items[0].offset) == 0
+    assert int(items[0].size) == 1
+    assert items[0].usage == hid_parser.Usage(
+        hid_parser.data.UsagePages.DIGITIZER_PAGE, hid_parser.data.Digitizer.TIP_SWITCH
+        )
+
+    assert isinstance(items[1], hid_parser.PaddingItem)
+    assert int(items[1].offset) == 1
+    assert int(items[1].size) == 1
+
+    assert isinstance(items[2], hid_parser.VariableItem)
+    assert int(items[2].offset) == 2
+    assert int(items[2].size) == 5
+    assert items[2].usage == hid_parser.Usage(
+        hid_parser.data.UsagePages.DIGITIZER_PAGE, hid_parser.data.Digitizer.CONTACT_ID
+        )
+
+    assert isinstance(items[3], hid_parser.VariableItem)
+    assert int(items[3].offset) == 7
+    assert int(items[3].size) == 1
+    assert items[3].usage == hid_parser.Usage(
+        hid_parser.data.UsagePages.DIGITIZER_PAGE, hid_parser.data.Digitizer.TOUCH_VALID
+        )
+
+    assert isinstance(items[4], hid_parser.VariableItem)
+    assert int(items[4].offset) == 8
+    assert int(items[4].size) == 8
+    assert items[4].usage == hid_parser.Usage(
+        hid_parser.data.UsagePages.DIGITIZER_PAGE, hid_parser.data.Digitizer.WIDTH
+        )
+
+    assert isinstance(items[5], hid_parser.VariableItem)
+    assert int(items[5].offset) == 16
+    assert int(items[5].size) == 8
+    assert items[5].usage == hid_parser.Usage(
+        hid_parser.data.UsagePages.DIGITIZER_PAGE, hid_parser.data.Digitizer.HEIGHT
+        )
+
+    assert isinstance(items[6], hid_parser.VariableItem)
+    assert int(items[6].offset) == 24
+    assert int(items[6].size) == 16
+    assert items[6].usage == hid_parser.Usage(
+        hid_parser.data.UsagePages.GENERIC_DESKTOP_CONTROLS_PAGE, hid_parser.data.GenericDesktopControls.X
+        )
+
+    assert isinstance(items[7], hid_parser.VariableItem)
+    assert int(items[7].offset) == 40
+    assert int(items[7].size) == 16
+    assert items[7].usage == hid_parser.Usage(
+        hid_parser.data.UsagePages.GENERIC_DESKTOP_CONTROLS_PAGE, hid_parser.data.GenericDesktopControls.X
+        )
+
+    assert isinstance(items[8], hid_parser.VariableItem)
+    assert int(items[8].offset) == 56
+    assert int(items[8].size) == 16
+    assert items[8].usage == hid_parser.Usage(
+        hid_parser.data.UsagePages.GENERIC_DESKTOP_CONTROLS_PAGE, hid_parser.data.GenericDesktopControls.Y
+        )
+
+    # The pattern repeats for 4 more fingers (items 8-39)
+    assert len(items[9:]) == 43
 
 
 @hypothesis.given(st.lists(st.integers(), max_size=4096))

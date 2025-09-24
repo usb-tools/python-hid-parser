@@ -1069,6 +1069,67 @@ class PowerDevice(UsagePage):
     ISERIALNUMBER = 0xFF, 'iSerialNumber', UsageTypes.SV
 
 
+class Digitizer(UsagePage):
+    UNDEFINED = 0x00, 'Undefined'
+    DIGITIZER = 0x01, 'Digitizer', UsageTypes.CA
+    PEN = 0x02, 'Pen', UsageTypes.CA
+    LIGHT_PEN = 0x03, 'Light Pen', UsageTypes.CA
+    TOUCH_SCREEN = 0x04, 'Touch Screen', UsageTypes.CA
+    TOUCH_PAD = 0x05, 'Touch Pad', UsageTypes.CA
+    WHITE_BOARD = 0x06, 'White Board', UsageTypes.CA
+    COORDINATE_MEASURING_MACHINE = 0x07, 'Coordinate Measuring Machine', UsageTypes.CA
+    D3_DIGITIZER = 0x08, '3D Digitizer', UsageTypes.CA
+    STEREO_PLOTTER = 0x09, 'Stereo Plotter', UsageTypes.CA
+    ARTICULATION_DEVICE = 0x0A, 'Articulation Device', UsageTypes.CA
+    ARMATURE = 0x0B, 'Armature', UsageTypes.CA
+    MULTIPOINT_DIGITIZER = 0x0C, 'Multiple Point Digitizer', UsageTypes.CA
+    FREE_SPACE_WANDERER = 0x0D, 'Free Space Wanderer', UsageTypes.CA
+    STYLUS = 0x20, 'Stylus', UsageTypes.CL
+    PUCK = 0x21, 'Puck', UsageTypes.CL
+    FINGER = 0x22, 'Finger', UsageTypes.CL
+    TIP_PRESSURE = 0x30, 'Tip Pressure', UsageTypes.DV
+    BARREL_PRESSURE = 0x31, 'Barrel Pressure', UsageTypes.DV
+    IN_RANGE = 0x32, 'In Range', UsageTypes.MC
+    TOUCH = 0x33, 'Touch', UsageTypes.MC
+    UNTOUCH = 0x34, 'Untouch', UsageTypes.MC
+    TAP = 0x35, 'Tap', UsageTypes.MC
+    QUALITY = 0x36, 'Quality', UsageTypes.DV
+    DATA_VALID = 0x37, 'Data Valid', UsageTypes.MC
+    TRANSDUCER_INDEX = 0x38, 'Transducer Index', UsageTypes.DV
+    TABLET_FUNCTION_KEYS = 0x39, 'Tablet Function Keys', UsageTypes.CL
+    PROGRAM_CHANGE_KEYS = 0x3A, 'Program Change Keys', UsageTypes.CL
+    BATTERY_STRENGTH = 0x3B, 'Battery Strength', UsageTypes.DV
+    INVERT = 0x3C, 'Invert', UsageTypes.MC
+    X_TILT = 0x3D, 'X Tilt', UsageTypes.DV
+    Y_TILT = 0x3E, 'Y Tilt', UsageTypes.DV
+    AZIMUTH = 0x3F, 'Azimuth', UsageTypes.DV
+    ALTITUDE = 0x40, 'Altitude', UsageTypes.DV
+    TWIST = 0x41, 'Twist', UsageTypes.DV
+    TIP_SWITCH = 0x42, 'Tip Switch', UsageTypes.MC
+    SECONDARY_TIP_SWITCH = 0x43, 'Secondary Tip Switch', UsageTypes.MC
+    BARREL_SWITCH = 0x44, 'Barrel Switch', UsageTypes.MC
+    ERASER = 0x45, 'Eraser', UsageTypes.MC
+    TABLET_PICK = 0x46, 'Tablet Pick', UsageTypes.MC
+    TOUCH_VALID = 0x47, 'Touch Valid', UsageTypes.MC
+    WIDTH = 0x48, 'Width', UsageTypes.DV
+    HEIGHT = 0x49, 'Height', UsageTypes.DV
+    CONTACT_ID = 0x51, 'Contact Identifier', UsageTypes.DV
+    DEVICE_MODE = 0x52, 'Device Mode', UsageTypes.DV
+    DEVICE_IDENTIFIER = 0x53, 'Device Identifier', UsageTypes.DV
+    CONTACT_COUNT = 0x54, 'Contact Count', UsageTypes.DV
+    CONTACT_COUNT_MAX = 0x55, 'Contact Count Maximum', UsageTypes.SV
+    SCAN_TIME = 0x56, 'Scan Time', UsageTypes.DV
+    SURFACE_SWITCH = 0x57, 'Surface Switch', UsageTypes.MC
+    BUTTON_SWITCH = 0x58, 'Button Switch', UsageTypes.MC
+    PAD_TYPE = 0x59, 'Pad Type', UsageTypes.SF
+    SECONDARY_BARREL_SWITCH = 0x5A, 'Secondary Barrel Switch', UsageTypes.MC
+    TRANSDUCER_SERIAL_NUMBER = 0x5B, 'Transducer Serial Number', UsageTypes.SV
+    PREFERRED_COLOR = 0x5C, 'Preferred Color', UsageTypes.CL
+    PREFERRED_COLOR_IS_LOCKED = 0x5D, 'Preferred Color is Locked', UsageTypes.OOC
+    PREFERRED_LINE_WIDTH = 0x5E, 'Preferred Line Width', UsageTypes.DV
+    PREFERRED_LINE_WIDTH_IS_LOCKED = 0x5F, 'Preferred Line Width is Locked', UsageTypes.OOC
+    SUPPORTED_COLORS = 0x60, 'Supported Colors', UsageTypes.NARY
+
 class FIDO(UsagePage):
     U2F_AUTHENTICATOR_DEVICEM = 0x01, 'U2F Authenticator Device'
     INPUT_REPORT_DATA = 0x20, 'Input Report Data'
@@ -1088,7 +1149,7 @@ class UsagePages(_Data[UsagePage]):
     ORDINAL_PAGE = 0x0A, 'Ordinal'
     TELEPHONY_PAGE = 0x0B, 'Telephony'
     CONSUMER_PAGE = 0x0C, 'Consumer', Consumer
-    DIGITIZER_PAGE = 0x0D, 'Digitizer'
+    DIGITIZER_PAGE = 0x0D, 'Digitizer', Digitizer
     HAPTICS_PAGE = 0x0E, 'Haptics'
     PID_PAGE = 0x0F, 'PID'
     UNICODE_PAGE = 0x10, 'Unicode'

@@ -783,13 +783,34 @@ class ReportDescriptor:
             self._append_item(offset_list, pool, report_id, item)
         else:
             if len(usages) != report_count:
-                error_str = f'Expecting {report_count} usages but got {len(usages)}'
-                warnings.warn(HIDComplianceWarning(error_str), stacklevel=2)
                 if len(usages) > report_count:
-                    report_count = len(usages)
+                    warnings.warn(
+                        HIDComplianceWarning(
+                            f'Report count ({report_count}) is less than number of usages ({len(usages)}), \
+                                truncating usages.'
+                            )
+                        , stacklevel=2
+                    )
+                    usages = usages[:report_count]
                 else:
-                    missing_usage_count = report_count - len(usages)
-                    usages += [] * missing_usage_count
+                    x_usage = Usage(
+                        hid_parser.data.UsagePages.GENERIC_DESKTOP_CONTROLS_PAGE,
+                        hid_parser.data.GenericDesktopControls.X
+                        )
+                    y_usage = Usage(
+                        hid_parser.data.UsagePages.GENERIC_DESKTOP_CONTROLS_PAGE,
+                        hid_parser.data.GenericDesktopControls.Y
+                        )
+                    if report_count > len(usages) and usages and usages[0] in (x_usage, y_usage):
+                        pad_usage = usages[0]
+                        for _ in range(report_count - len(usages)):
+                            usages.append(pad_usage)
+                    else:
+                        missing_usage_count = report_count - len(usages)
+                        usages += [] * missing_usage_count
+                        warning_message = f'Report count ({report_count}) is greater than number of \
+                            usages ({len(usages)}), share the unused usage count to next usage'
+                        warnings.warn(HIDComplianceWarning(warning_message), stacklevel=2)
 
             for usage in usages:
                 item = VariableItem(
