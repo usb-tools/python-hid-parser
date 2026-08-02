@@ -819,6 +819,7 @@ class ReportDescriptor:
         usage_min: int | None = None
         glob: dict[str, Any] = {}
         local: dict[str, Any] = {}
+        state_stack: list[tuple[Any, ...]] = []
 
         for typ, tag, data in self._iterate_raw():
             if typ == Type.MAIN:
@@ -925,6 +926,27 @@ class ReportDescriptor:
 
                 elif tag == TagGlobal.REPORT_COUNT:
                     report_count = data
+
+                elif tag == TagGlobal.PUSH:
+                    state_stack.append(
+                        (
+                            usage_page,
+                            report_id,
+                            report_count,
+                            report_size,
+                            dict(glob),
+                        )
+                    )
+
+                elif tag == TagGlobal.POP:
+                    if not state_stack:
+                        msg = 'Pop without a matching Push'
+                        raise InvalidReportDescriptor(msg)
+                    usage_page, report_id, report_count, report_size, glob = state_stack.pop()
+                    # a pushed/recovered report id may have no offset slot yet
+                    for offset_list in (offset_input, offset_output, offset_feature):
+                        if report_id not in offset_list:
+                            offset_list[report_id] = 0
 
                 else:
                     msg = f'Unsupported global tag: {bin(tag)}'
