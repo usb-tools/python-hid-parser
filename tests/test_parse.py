@@ -360,7 +360,7 @@ def test_parse_push_pop():
 
 
 def test_parse_pop_without_push_raises():
-    rdesc = [0xb4]  # Pop without a matching Push
+    rdesc = [0xB4]  # Pop without a matching Push
 
     with pytest.raises(hid_parser.InvalidReportDescriptor):
         hid_parser.ReportDescriptor(rdesc)
