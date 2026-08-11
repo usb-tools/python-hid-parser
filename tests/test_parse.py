@@ -295,3 +295,72 @@ def test_hypothesis(rdesc):
         hid_parser.ReportDescriptor(rdesc)
     except (hid_parser.InvalidReportDescriptor, NotImplementedError):
         pass
+
+
+# fmt: off
+
+push_pop_rdesc = [
+    0x05, 0x01,  # Usage Page (Generic Desktop)          0
+    0x09, 0x02,  # Usage (Mouse)                         2
+    0xa1, 0x01,  # Collection (Application)              4
+    0x09, 0x01,  #  Usage (Pointer)                      6
+    0xa1, 0x00,  #  Collection (Physical)                8
+    0x15, 0x00,  #   Logical Minimum (0)                 10
+    0x25, 0x7f,  #   Logical Maximum (127)               12
+    0x75, 0x08,  #   Report Size (8)                     14
+    0x95, 0x01,  #   Report Count (1)                    16
+    0xa4,        #   Push                                18
+    0x15, 0x81,  #   Logical Minimum (-127)              19
+    0x25, 0x7f,  #   Logical Maximum (127)               21
+    0x75, 0x08,  #   Report Size (8)                     23
+    0x95, 0x02,  #   Report Count (2)                    25
+    0x09, 0x30,  #   Usage (X)                           27
+    0x09, 0x31,  #   Usage (Y)                           29
+    0x81, 0x02,  #   Input (Data,Var,Abs)                31
+    0xb4,        #   Pop                                 33
+    0x09, 0x38,  #   Usage (Wheel)                       34
+    0x81, 0x02,  #   Input (Data,Var,Abs)                36
+    0xc0,        #  End Collection                       38
+    0xc0,        # End Collection                        39
+]
+
+# fmt: on
+
+
+def test_parse_push_pop():
+    rdesc = hid_parser.ReportDescriptor(push_pop_rdesc)
+
+    items = rdesc.get_input_items()
+
+    assert len(items) == 3
+
+    x, y, wheel = items
+
+    assert isinstance(x, hid_parser.VariableItem)
+    assert x.usage == hid_parser.Usage(hid_parser.data.UsagePages.GENERIC_DESKTOP_CONTROLS_PAGE, 0x30)
+    assert int(x.offset) == 0
+    assert int(x.size) == 8
+    assert x.logical_min == -127
+    assert x.logical_max == 127
+
+    assert isinstance(y, hid_parser.VariableItem)
+    assert y.usage == hid_parser.Usage(hid_parser.data.UsagePages.GENERIC_DESKTOP_CONTROLS_PAGE, 0x31)
+    assert int(y.offset) == 8
+    assert int(y.size) == 8
+    assert y.logical_min == -127
+    assert y.logical_max == 127
+
+    # after Pop the pushed logical min/max should have been restored
+    assert isinstance(wheel, hid_parser.VariableItem)
+    assert wheel.usage == hid_parser.Usage(hid_parser.data.UsagePages.GENERIC_DESKTOP_CONTROLS_PAGE, 0x38)
+    assert int(wheel.offset) == 8 * 2
+    assert int(wheel.size) == 8
+    assert wheel.logical_min == 0
+    assert wheel.logical_max == 127
+
+
+def test_parse_pop_without_push_raises():
+    rdesc = [0xB4]  # Pop without a matching Push
+
+    with pytest.raises(hid_parser.InvalidReportDescriptor):
+        hid_parser.ReportDescriptor(rdesc)
