@@ -18,7 +18,7 @@ def mypy(session):
     session.run('mypy', '-p', 'hid_parser')
 
 
-@nox.session(python=['3.9', '3.10', '3.11', '3.12', '3.13'])
+@nox.session(python=['3.9', '3.10', '3.11', '3.12', '3.13', '3.14', '3.15'])
 def test(session):
     htmlcov_output = os.path.join(session.virtualenv.location, 'htmlcov')
     xmlcov_output = os.path.join(session.virtualenv.location, f'coverage-{session.python}.xml')
